@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://addons/scene_map/scene_map.gd" type="Script" id=1]
+[ext_resource path="res://addons/scene_map/scene_palette.gd" type="Script" id=2]
+
+[sub_resource type="Resource" id=1]
+script = ExtResource( 2 )
+
+[node name="Spatial" type="Spatial"]
+
+[node name="GridMap" type="GridMap" parent="."]
+data = {
+"cells": PoolIntArray(  )
+}
+__meta__ = {
+"_editor_clip_": 0
+}
+
+[node name="SceneMap" type="Spatial" parent="."]
+script = ExtResource( 1 )
+palette = SubResource( 1 )
+cell_size = Vector3( 1, 1, 1 )
+cell_center_x = true
+cell_center_y = true
+cell_center_z = true
