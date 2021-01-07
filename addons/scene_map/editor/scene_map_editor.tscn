@@ -1,0 +1,71 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/scene_map/editor/scene_map_editor.gd" type="Script" id=1]
+[ext_resource path="res://addons/scene_map/scene_map.svg" type="Texture" id=2]
+
+[node name="SceneMapEditor" type="VBoxContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = -794.0
+rect_min_size = Vector2( 230, 0 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Toolbar" type="HBoxContainer" parent="."]
+margin_right = 230.0
+margin_bottom = 24.0
+alignment = 2
+
+[node name="FloorLabel" type="Label" parent="Toolbar"]
+margin_left = 4.0
+margin_top = 5.0
+margin_right = 40.0
+margin_bottom = 19.0
+text = "Floor:"
+
+[node name="FloorBox" type="SpinBox" parent="Toolbar"]
+margin_left = 44.0
+margin_right = 118.0
+margin_bottom = 24.0
+min_value = -32767.0
+max_value = 32767.0
+
+[node name="VSeparator" type="VSeparator" parent="Toolbar"]
+margin_left = 122.0
+margin_right = 126.0
+margin_bottom = 24.0
+
+[node name="MenuButton" type="MenuButton" parent="Toolbar"]
+margin_left = 130.0
+margin_right = 230.0
+margin_bottom = 24.0
+text = "Scene Map"
+icon = ExtResource( 2 )
+
+[node name="SearchBar" type="HBoxContainer" parent="."]
+margin_top = 28.0
+margin_right = 230.0
+margin_bottom = 52.0
+
+[node name="Search" type="LineEdit" parent="SearchBar"]
+margin_right = 230.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+placeholder_text = "Filter Scenes"
+
+[node name="Palette" type="ItemList" parent="."]
+margin_top = 56.0
+margin_right = 230.0
+margin_bottom = 565.0
+size_flags_vertical = 3
+
+[node name="NoPaletteWarning" type="Label" parent="."]
+margin_top = 569.0
+margin_right = 230.0
+margin_bottom = 600.0
+text = "Assign a ScenePalette to this SceneMap."
+align = 1
+valign = 1
+autowrap = true

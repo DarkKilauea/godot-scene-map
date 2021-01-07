@@ -1,25 +1,32 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://addons/scene_map/scene_map.gd" type="Script" id=1]
-[ext_resource path="res://addons/scene_map/scene_palette.gd" type="Script" id=2]
-
-[sub_resource type="Resource" id=1]
-script = ExtResource( 2 )
+[ext_resource path="res://test_mesh_library.tres" type="MeshLibrary" id=2]
+[ext_resource path="res://test_scene_palette.tres" type="Resource" id=3]
 
 [node name="Spatial" type="Spatial"]
 
 [node name="GridMap" type="GridMap" parent="."]
+mesh_library = ExtResource( 2 )
 data = {
-"cells": PoolIntArray(  )
+"cells": PoolIntArray( 65533, 65533, 0, 65534, 65533, 0, 65535, 65533, 0, 131069, 65533, 1, 131071, 65533, 536870913, 65533, 65534, 0, 65534, 65534, 0, 65535, 65534, 0, 131070, 65534, 0, 131071, 65534, 0, 196606, 65534, 1, 65533, 65535, 0, 65534, 65535, 536870912, 65535, 65535, 0, 131069, 65535, 536870913, 131070, 65535, 0, 131071, 65535, 0, 196607, 65535, 0 )
 }
 __meta__ = {
-"_editor_clip_": 0
+"_edit_lock_": true,
+"_editor_clip_": 0,
+"_editor_floor_": Vector3( 0, 0, 0 )
 }
 
 [node name="SceneMap" type="Spatial" parent="."]
 script = ExtResource( 1 )
-palette = SubResource( 1 )
-cell_size = Vector3( 1, 1, 1 )
+__meta__ = {
+"_edit_lock_": true
+}
+palette = ExtResource( 3 )
+cell_size = Vector3( 2, 2, 2 )
 cell_center_x = true
 cell_center_y = true
 cell_center_z = true
+cell_map = {
+
+}
