@@ -6,7 +6,7 @@ var item_map := {};
 
 
 func _set(property: String, value) -> bool:
-	if property.begins_with("item/"):
+	if property.begins_with("items/"):
 		var parts := property.split("/");
 		if parts.size() != 3:
 			push_error("Not enough parts (need 3) for property: %s" % property);
@@ -32,7 +32,7 @@ func _set(property: String, value) -> bool:
 
 
 func _get(property: String):
-	if property.begins_with("item/"):
+	if property.begins_with("items/"):
 		var parts := property.split("/");
 		if parts.size() != 3:
 			push_error("Not enough parts (need 3) for property: %s" % property);
@@ -66,7 +66,7 @@ func _get_property_list() -> Array:
 	];
 	
 	for item_id in item_map:
-		var prefix = "item/%d/" % item_id;
+		var prefix = "items/%d/" % item_id;
 		props.append({ 
 			"name": prefix + "name", 
 			"type": TYPE_STRING 
@@ -77,6 +77,17 @@ func _get_property_list() -> Array:
 			"hint": PROPERTY_HINT_RESOURCE_TYPE, 
 			"hint_string": "PackedScene" 
 		});
+		props.append({
+			"name": prefix + "remove_item",
+			"type": TYPE_NIL,
+			"usage": PROPERTY_USAGE_EDITOR
+		});
+	
+	props.append({
+		"name": "items/%d/add_item" % get_next_available_id(),
+		"type": TYPE_NIL,
+		"usage": PROPERTY_USAGE_EDITOR
+	});
 	
 	return props;
 

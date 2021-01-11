@@ -7,9 +7,9 @@
 
 [resource]
 script = ExtResource( 1 )
-item/0/name = "Floor"
-item/0/scene = ExtResource( 2 )
-item/1/name = "Block"
-item/1/scene = ExtResource( 3 )
-item/2/name = "Fire Floor"
-item/2/scene = ExtResource( 4 )
+items/0/name = "Floor"
+items/0/scene = ExtResource( 2 )
+items/1/name = "Block"
+items/1/scene = ExtResource( 3 )
+items/2/name = "Fire Floor"
+items/2/scene = ExtResource( 4 )
