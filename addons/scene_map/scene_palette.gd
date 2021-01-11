@@ -99,7 +99,7 @@ func create_item(item_id: int) -> void:
 		push_error("Item ID is already present in palette.");
 	
 	item_map[item_id] = Item.new();
-	property_list_changed_notify();
+	_emit_changed();
 
 
 func remove_item(item_id: int) -> void:
@@ -109,7 +109,7 @@ func remove_item(item_id: int) -> void:
 		push_error("Item ID is not present in palette.");
 	
 	item_map.erase(item_id);
-	property_list_changed_notify();
+	_emit_changed();
 
 
 func get_item_name(item_id: int) -> String:
@@ -130,7 +130,7 @@ func set_item_name(item_id: int, name: String) -> void:
 		push_error("Item ID is not present in palette.");
 	
 	item_map[item_id].name = name;
-	property_list_changed_notify();
+	_emit_changed();
 
 
 func get_item_scene(item_id: int) -> PackedScene:
@@ -151,7 +151,7 @@ func set_item_scene(item_id: int, scene: PackedScene) -> void:
 		push_error("Item ID is not present in palette.");
 	
 	item_map[item_id].scene = scene;
-	property_list_changed_notify();
+	_emit_changed();
 
 
 func has_item(item_id: int) -> bool:
@@ -167,7 +167,7 @@ func get_item_ids() -> Array:
 
 func clear() -> void:
 	item_map.clear();
-	property_list_changed_notify();
+	_emit_changed();
 
 
 func get_next_available_id() -> int:
@@ -175,6 +175,11 @@ func get_next_available_id() -> int:
 		return 0;
 	else:
 		return item_map.size();
+
+
+func _emit_changed():
+	property_list_changed_notify();
+	emit_signal("changed");
 
 
 class Item:

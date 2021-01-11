@@ -2,12 +2,15 @@ tool
 extends Spatial
 
 
-const ScenePalette = preload("scene_palette.gd")
+const ScenePalette = preload("scene_palette.gd");
 const INVALID_CELL_ITEM = -1;
 
 
+signal palette_changed;
+
+
 # Palette containing scenes that should be instanced in this grid.
-var palette: ScenePalette;
+var palette: ScenePalette setget _set_palette;
 
 # Size of each cell in the grid.  Should match the size of the scenes in the attached palette.
 var cell_size: Vector3 = Vector3(2, 2, 2);
@@ -78,6 +81,19 @@ func _get_property_list() -> Array:
 	];
 
 
+func _set_palette(value: ScenePalette) -> void:
+	if palette != value:
+		if palette:
+			palette.disconnect("changed", self, "_on_palette_changed");
+		
+		palette = value;
+		
+		if palette:
+			palette.connect("changed", self, "_on_palette_changed");
+		
+		_on_palette_changed();
+
+
 # Set a cell in the map to contain the scene in the palette as indicated by item_id.
 # @param coordinate Vector3 specifying the x, y, and z coordinates of the cell.
 # @param item_id ID of the scene to place at this cell.
@@ -99,3 +115,7 @@ func get_cell_item(coordinate: Vector3) -> int:
 
 func _rebuild() -> void:
 	pass;
+
+
+func _on_palette_changed():
+	emit_signal("palette_changed", palette);

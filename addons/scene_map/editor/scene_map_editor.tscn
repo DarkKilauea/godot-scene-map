@@ -58,13 +58,14 @@ placeholder_text = "Filter Scenes"
 [node name="Palette" type="ItemList" parent="."]
 margin_top = 56.0
 margin_right = 230.0
-margin_bottom = 565.0
+margin_bottom = 326.0
 size_flags_vertical = 3
 
 [node name="NoPaletteWarning" type="Label" parent="."]
-margin_top = 569.0
+margin_top = 330.0
 margin_right = 230.0
 margin_bottom = 600.0
+size_flags_vertical = 3
 text = "Assign a ScenePalette to this SceneMap."
 align = 1
 valign = 1
