@@ -49,4 +49,9 @@ func make_visible(visible: bool) -> void:
 	if visible:
 		scene_map_editor.show();
 	else:
+		scene_map_editor.edit(null);
 		scene_map_editor.hide();
+
+
+func forward_spatial_gui_input(camera: Camera, event: InputEvent) -> bool:
+	return scene_map_editor.handle_spatial_input(camera, event);
