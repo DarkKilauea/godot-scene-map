@@ -32,3 +32,7 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0 )
 visibility_aabb = AABB( -1, 0, -1, 2, 2, 2 )
 process_material = SubResource( 2 )
 draw_pass_1 = SubResource( 4 )
+
+[node name="OmniLight" type="OmniLight" parent="."]
+light_color = Color( 1, 0.992157, 0.8, 1 )
+omni_attenuation = 2.0

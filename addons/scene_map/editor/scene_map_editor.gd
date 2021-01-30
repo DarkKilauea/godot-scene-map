@@ -6,12 +6,24 @@ const SceneMap = preload("../scene_map.gd");
 const ScenePalette = preload("../scene_palette.gd");
 
 
+enum InputAction {
+	None,
+	Paint,
+	Erase
+}
+
+
 var scene_map: SceneMap;
 var cursor: MeshInstance;
+var edit_axis: int = Vector3.AXIS_Y;
+var edit_floor: int = 0;
+var selected_item_id: int = 0;
+var current_input_action: int = InputAction.None;
 
 
 onready var palette_list := $Palette as ItemList;
 onready var no_palette_warning := $NoPaletteWarning as Label;
+onready var floor_control := $Toolbar/FloorBox as SpinBox;
 
 
 func _enter_tree() -> void:
@@ -54,34 +66,70 @@ func handle_spatial_input(camera: Camera, event: InputEvent) -> bool:
 	if !scene_map || !scene_map.palette:
 		return false;
 	
+	var click_event := event as InputEventMouseButton;
+	if click_event:
+		if click_event.button_index == BUTTON_WHEEL_UP && click_event.shift:
+			if click_event.pressed:
+				floor_control.value += click_event.factor;
+			return true;
+		elif click_event.button_index == BUTTON_WHEEL_DOWN && click_event.shift:
+			if click_event.pressed:
+				floor_control.value -= click_event.factor;
+			return true;
+		
+		if click_event.pressed:
+			if click_event.button_index == BUTTON_LEFT:
+				current_input_action = InputAction.Paint;
+			elif click_event.button_index == BUTTON_RIGHT:
+				current_input_action = InputAction.Erase;
+			else:
+				return false;
+			
+			return _handle_input(camera, click_event.position);
+		else:
+			current_input_action = InputAction.None;
+	
 	var move_event := event as InputEventMouseMotion;
 	if move_event:
-		_update_cursor_location(camera, move_event.position);
-		return false;
+		return _handle_input(camera, move_event.position);
 	
 	return false;
 
 
-func _update_cursor_location(camera: Camera, point: Vector2) -> void:
+func _handle_input(camera: Camera, point: Vector2) -> bool:
 	var from := camera.project_ray_origin(point);
 	var normal := camera.project_ray_normal(point);
 	
-	var plane := Plane.PLANE_XZ;
+	var plane := Plane();
+	plane.normal[edit_axis] = 1.0;
+	plane.d = edit_floor * scene_map.cell_size[edit_axis];
+	
 	var hit := plane.intersects_ray(from, normal);
 	if !hit:
-		return;
+		return false;
 	
-	var cell := (hit / scene_map.cell_size).floor();
-	var cell_location := cell;
+	var cell := Vector3();
+	for i in range(3):
+		if i == edit_axis:
+			cell[i] = edit_floor;
+		else:
+			cell[i] = floor(hit[i] / scene_map.cell_size[i]);
 	
-	if scene_map.cell_center_x:
-		cell_location.x += 0.5;
-	if scene_map.cell_center_y:
-		cell_location.y += 0.5;
-	if scene_map.cell_center_z:
-		cell_location.z += 0.5;
+	_update_cursor_location(cell);
 	
-	cell_location *= scene_map.cell_size;
+	match current_input_action:
+		InputAction.Paint:
+			scene_map.set_cell_item(cell, selected_item_id);
+			return true;
+		InputAction.Erase:
+			scene_map.set_cell_item(cell, -1);
+			return true;
+	
+	return false;
+
+
+func _update_cursor_location(cell: Vector3) -> void:
+	var cell_location := scene_map.get_global_cell_position(cell);
 	
 	cursor.scale = scene_map.cell_size;
 	cursor.global_transform.origin = cell_location;
@@ -100,3 +148,13 @@ func _update_palette(palette: ScenePalette) -> void:
 	
 	for item_id in palette.get_item_ids():
 		palette_list.add_item(palette.get_item_name(item_id));
+		palette_list.set_item_metadata(palette_list.get_item_count() - 1, item_id);
+
+
+func _floor_changed(value: float) -> void:
+	edit_floor = value;
+
+
+func _item_selected(index: int) -> void:
+	var item_id := palette_list.get_item_metadata(index) as int;
+	selected_item_id = item_id;

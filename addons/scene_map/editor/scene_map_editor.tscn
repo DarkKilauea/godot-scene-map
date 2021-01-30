@@ -70,3 +70,6 @@ text = "Assign a ScenePalette to this SceneMap."
 align = 1
 valign = 1
 autowrap = true
+
+[connection signal="value_changed" from="Toolbar/FloorBox" to="." method="_floor_changed"]
+[connection signal="item_selected" from="Palette" to="." method="_item_selected"]
