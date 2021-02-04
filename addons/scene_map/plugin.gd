@@ -20,12 +20,14 @@ func _enter_tree() -> void:
 	add_inspector_plugin(scene_palette_inspector);
 	
 	scene_map_editor = preload("editor/scene_map_editor.tscn").instance();
+	scene_map_editor.plugin = self;
 	add_control_to_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_SIDE_RIGHT, scene_map_editor);
 	scene_map_editor.hide();
 
 
 func _exit_tree() -> void:
 	remove_control_from_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_SIDE_RIGHT, scene_map_editor);
+	scene_map_editor.plugin = null;
 	scene_map_editor.free();
 	scene_map_editor = null;
 	

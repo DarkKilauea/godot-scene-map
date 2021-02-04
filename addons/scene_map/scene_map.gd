@@ -29,9 +29,6 @@ var cell_center_z: bool = true setget _set_cell_center_z;
 # value: int
 var cell_map: Dictionary = {};
 
-# Map of the instances of each scene with the cell location they occur at.
-var instance_map: Dictionary = {};
-
 # List of cells that need to be rebuilt.
 var dirty_cell_list: Array = [];
 
@@ -178,8 +175,8 @@ func _request_rebuild() -> void:
 
 
 func _rebuild() -> void:
-	for coord in instance_map:
-		_remove_instance(coord);
+	for child in self.get_children():
+		_remove_instance(child);
 	
 	for coord in cell_map:
 		_place_instance(coord);
@@ -200,8 +197,8 @@ func _mark_dirty(coordinate: Vector3) -> void:
 
 func _update_dirty_cells() -> void:
 	for cell in dirty_cell_list:
-		if instance_map.has(cell):
-			_remove_instance(cell);
+		for child in _find_nodes_in_cell(cell):
+			_remove_instance(child);
 		
 		if cell_map.has(cell):
 			_place_instance(cell);
@@ -209,33 +206,46 @@ func _update_dirty_cells() -> void:
 	dirty_cell_list = [];
 
 
-func _remove_instance(coordinate: Vector3) -> void:
-	if instance_map.has(coordinate):
-		var node := instance_map[coordinate] as Node;
-		instance_map.erase(coordinate);
-		node.queue_free();
+func _find_nodes_in_cell(coordinate: Vector3) -> Array:
+	var results := [];
+	
+	for child in self.get_children():
+		var spatial := child as Spatial;
+		if spatial:
+			if spatial.translation.is_equal_approx(get_global_cell_position(coordinate)):
+				results.append(spatial);
+	
+	return results;
+
+
+func _remove_instance(node: Node) -> void:
+	self.remove_child(node);
+	node.queue_free();
 
 
 func _place_instance(coordinate: Vector3) -> void:
-	if instance_map.has(coordinate):
-		push_error("Tried to place instance in a cell that was occupied: %s" % coordinate);
-		return;
-	
 	var item_id := cell_map[coordinate] as int;
 	var scene := palette.get_item_scene(item_id);
 	if !scene:
 		push_error("Missing scene for item %s at cell %s" % [item_id, coordinate]);
 		return;
 	
-	var node := scene.instance();
+	var node := scene.instance(PackedScene.GEN_EDIT_STATE_INSTANCE if Engine.editor_hint else PackedScene.GEN_EDIT_STATE_DISABLED);
 	node.name = palette.get_item_name(item_id);
-	self.add_child(node, true);
-	
-	instance_map[coordinate] = node;
 	
 	var spatial := node as Spatial;
 	if spatial:
 		spatial.translation = get_global_cell_position(coordinate);
+	
+	self.add_child(node, true);
+	
+	# Climb the nodes above us, looking for an owner to attach to.
+	var parent: Node = self;
+	while parent:
+		if parent.owner:
+			node.owner = parent.owner;
+			break;
+		parent = parent.get_parent();
 
 
 func _on_palette_changed():

@@ -13,6 +13,7 @@ enum InputAction {
 }
 
 
+var plugin: EditorPlugin;
 var scene_map: SceneMap;
 var cursor: MeshInstance;
 var edit_axis: int = Vector3.AXIS_Y;
