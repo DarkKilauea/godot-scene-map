@@ -26,19 +26,11 @@ var cell_center_z: bool = true setget _set_cell_center_z;
 
 # Contains a sparse collection of filled cells with the Id of the scene in the palette.
 # key: Vector3
-# value: int
+# value: { itemId: int, path: NodePath }
 var cell_map: Dictionary = {};
 
-# List of cells that need to be rebuilt.
-var dirty_cell_list: Array = [];
-
-# Whether a rebuild is currently pending.
-var rebuild_pending: bool = false;
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	_rebuild();
+# Whether a layout is currently pending.
+var layout_pending: bool = false;
 
 
 func _get_property_list() -> Array:
@@ -102,42 +94,44 @@ func _set_cell_size(value: Vector3) -> void:
 	
 	if cell_size != value:
 		cell_size = value;
-		_request_rebuild();
+		_request_layout();
 
 
 func _set_cell_center_x(value: bool) -> void:
 	if cell_center_x != value:
 		cell_center_x = value;
-		_request_rebuild();
+		_request_layout();
 
 
 func _set_cell_center_y(value: bool) -> void:
 	if cell_center_y != value:
 		cell_center_y = value;
-		_request_rebuild();
+		_request_layout();
 
 
 func _set_cell_center_z(value: bool) -> void:
 	if cell_center_z != value:
 		cell_center_z = value;
-		_request_rebuild();
+		_request_layout();
 
 
 # Set a cell in the map to contain the scene in the palette as indicated by item_id.
 # @param coordinate Vector3 specifying the x, y, and z coordinates of the cell.
 # @param item_id ID of the scene to place at this cell.
-func set_cell_item(coordinate: Vector3, item_id: int) -> void:
+# @returns True if the item was removed or placed, false if item was already present when placing.
+func set_cell_item(coordinate: Vector3, item_id: int) -> bool:
 	coordinate = coordinate.floor();
 	
 	if get_cell_item(coordinate) == item_id:
-		return;
+		return false;
 	
 	if item_id == INVALID_CELL_ITEM:
-		cell_map.erase(coordinate);
+		return _remove_instance(coordinate);
 	else:
-		cell_map[coordinate] = item_id;
-	
-	_mark_dirty(coordinate);
+		if cell_map.has(coordinate):
+			_remove_instance(coordinate);
+		
+		return _place_instance(coordinate, item_id);
 
 
 # Gets the palette ID of the item at the indicated coordinates.
@@ -147,7 +141,8 @@ func get_cell_item(coordinate: Vector3) -> int:
 	coordinate = coordinate.floor();
 	
 	if cell_map.has(coordinate):
-		return cell_map.get(coordinate);
+		var data := cell_map.get(coordinate) as Dictionary;
+		return data.itemId;
 	
 	return INVALID_CELL_ITEM;
 
@@ -166,69 +161,44 @@ func get_global_cell_position(coordinate: Vector3) -> Vector3:
 	return cell_location;
 
 
-func _request_rebuild() -> void:
-	if rebuild_pending:
+func _request_layout() -> void:
+	if layout_pending:
 		return;
 	
-	rebuild_pending = true;
-	call_deferred("_rebuild");
+	layout_pending = true;
+	call_deferred("_layout");
 
 
-func _rebuild() -> void:
-	for child in self.get_children():
-		_remove_instance(child);
-	
-	for coord in cell_map:
-		_place_instance(coord);
-	
-	dirty_cell_list = [];
-	rebuild_pending = false;
-
-
-func _mark_dirty(coordinate: Vector3) -> void:
-	var was_empty := dirty_cell_list.empty();
-	
-	if !dirty_cell_list.has(coordinate):
-		dirty_cell_list.append(coordinate);
-	
-	if was_empty:
-		call_deferred("_update_dirty_cells");
-
-
-func _update_dirty_cells() -> void:
-	for cell in dirty_cell_list:
-		for child in _find_nodes_in_cell(cell):
-			_remove_instance(child);
-		
-		if cell_map.has(cell):
-			_place_instance(cell);
-	
-	dirty_cell_list = [];
-
-
-func _find_nodes_in_cell(coordinate: Vector3) -> Array:
-	var results := [];
-	
-	for child in self.get_children():
-		var spatial := child as Spatial;
+func _layout() -> void:
+	for coordinate in cell_map:
+		var data := cell_map.get(coordinate) as Dictionary;
+		var spatial := get_node(data.path) as Spatial;
 		if spatial:
-			if spatial.translation.is_equal_approx(get_global_cell_position(coordinate)):
-				results.append(spatial);
+			spatial.translation = get_global_cell_position(coordinate);
 	
-	return results;
+	layout_pending = false;
 
 
-func _remove_instance(node: Node) -> void:
+func _remove_instance(coordinate: Vector3) -> bool:
+	var data := cell_map.get(coordinate) as Dictionary;
+	var node := get_node_or_null(data.path);
+	if !node:
+		push_error("Could not find scene at %s (%s) to remove." % [data.path, coordinate]);
+		cell_map.erase(coordinate);
+		return false;
+	
 	self.remove_child(node);
 	node.queue_free();
+	
+	cell_map.erase(coordinate);
+	return true;
 
 
-func _place_instance(coordinate: Vector3) -> void:
-	var item_id := cell_map[coordinate] as int;
+func _place_instance(coordinate: Vector3, item_id: int) -> bool:
 	var scene := palette.get_item_scene(item_id);
 	if !scene:
 		push_error("Missing scene for item %s at cell %s" % [item_id, coordinate]);
-		return;
+		return false;
 	
 	var node := scene.instance(PackedScene.GEN_EDIT_STATE_INSTANCE if Engine.editor_hint else PackedScene.GEN_EDIT_STATE_DISABLED);
 	node.name = palette.get_item_name(item_id);
@@ -246,8 +216,25 @@ func _place_instance(coordinate: Vector3) -> void:
 			node.owner = parent.owner;
 			break;
 		parent = parent.get_parent();
+	
+	cell_map[coordinate] = {
+		"itemId": item_id,
+		"path": self.get_path_to(node)
+	};
+	
+	return true;
+
+
+func _rebuild() -> void:
+	var cells := cell_map.keys();
+	for cell in cells:
+		var data := cell_map.get(cell) as Dictionary;
+		var item_id := data.itemId as int;
+		
+		_remove_instance(cell);
+		_place_instance(cell, item_id);
 
 
 func _on_palette_changed():
 	emit_signal("palette_changed", palette);
-	_request_rebuild();
+	_rebuild();
