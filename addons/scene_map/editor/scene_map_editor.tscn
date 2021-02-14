@@ -50,16 +50,36 @@ margin_right = 230.0
 margin_bottom = 52.0
 
 [node name="Search" type="LineEdit" parent="SearchBar"]
-margin_right = 230.0
+margin_right = 198.0
 margin_bottom = 24.0
 size_flags_horizontal = 3
 placeholder_text = "Filter Scenes"
+
+[node name="Thumbnail" type="Button" parent="SearchBar"]
+margin_left = 202.0
+margin_right = 214.0
+margin_bottom = 24.0
+toggle_mode = true
+pressed = true
+flat = true
+
+[node name="List" type="Button" parent="SearchBar"]
+margin_left = 218.0
+margin_right = 230.0
+margin_bottom = 24.0
+toggle_mode = true
+flat = true
 
 [node name="Palette" type="ItemList" parent="."]
 margin_top = 56.0
 margin_right = 230.0
 margin_bottom = 326.0
 size_flags_vertical = 3
+max_text_lines = 2
+max_columns = 0
+fixed_column_width = 64
+icon_mode = 0
+fixed_icon_size = Vector2( 64, 64 )
 
 [node name="NoPaletteWarning" type="Label" parent="."]
 margin_top = 330.0
@@ -70,6 +90,7 @@ text = "Assign a ScenePalette to this SceneMap."
 align = 1
 valign = 1
 autowrap = true
-
 [connection signal="value_changed" from="Toolbar/FloorBox" to="." method="_floor_changed"]
+[connection signal="pressed" from="SearchBar/Thumbnail" to="." method="_set_display_mode" binds= [ 0 ]]
+[connection signal="pressed" from="SearchBar/List" to="." method="_set_display_mode" binds= [ 1 ]]
 [connection signal="item_selected" from="Palette" to="." method="_item_selected"]

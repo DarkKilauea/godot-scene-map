@@ -6,6 +6,11 @@ const SceneMap = preload("../scene_map.gd");
 const ScenePalette = preload("../scene_palette.gd");
 
 
+enum PaletteDisplayMode {
+	Thumbnail,
+	List
+}
+
 enum InputAction {
 	None,
 	Paint,
@@ -21,11 +26,14 @@ var edit_floor: int = 0;
 var selected_item_id: int = 0;
 var current_input_action: int = InputAction.None;
 var changed_items: Array = [];
+var display_mode: int = PaletteDisplayMode.Thumbnail;
 
 
 onready var palette_list := $Palette as ItemList;
 onready var no_palette_warning := $NoPaletteWarning as Label;
 onready var floor_control := $Toolbar/FloorBox as SpinBox;
+onready var thumbnail_button := $SearchBar/Thumbnail as Button;
+onready var list_button := $SearchBar/List as Button;
 
 
 func _enter_tree() -> void:
@@ -47,6 +55,11 @@ func _enter_tree() -> void:
 func _exit_tree() -> void:
 	cursor.queue_free();
 	cursor = null;
+
+
+func _ready() -> void:
+	thumbnail_button.icon = get_icon("FileThumbnail", "EditorIcons");
+	list_button.icon = get_icon("FileList", "EditorIcons");
 
 
 func edit(p_scene_map: SceneMap) -> void:
@@ -171,6 +184,8 @@ func _update_cursor_location(cell: Vector3) -> void:
 
 
 func _update_palette(palette: ScenePalette) -> void:
+	var last_selected_id := selected_item_id;
+	
 	palette_list.clear();
 	
 	if !palette:
@@ -181,9 +196,26 @@ func _update_palette(palette: ScenePalette) -> void:
 	no_palette_warning.hide();
 	palette_list.show();
 	
+	match display_mode:
+		PaletteDisplayMode.Thumbnail:
+			palette_list.max_columns = 0;
+			palette_list.icon_mode = ItemList.ICON_MODE_TOP;
+			palette_list.fixed_column_width = 64;
+			palette_list.fixed_icon_size = Vector2(64, 64);
+		PaletteDisplayMode.List:
+			palette_list.max_columns = 1;
+			palette_list.icon_mode = ItemList.ICON_MODE_LEFT;
+			palette_list.fixed_column_width = 0;
+			palette_list.fixed_icon_size = Vector2.ZERO;
+	
+	var previewer := plugin.get_editor_interface().get_resource_previewer();
 	for item_id in palette.get_item_ids():
 		palette_list.add_item(palette.get_item_name(item_id));
 		palette_list.set_item_metadata(palette_list.get_item_count() - 1, item_id);
+		previewer.queue_resource_preview(palette.get_item_scene(item_id).resource_path, self, "_thumbnail_result", item_id);
+	
+	if last_selected_id >= 0 && palette_list.get_item_count() > 0:
+		palette_list.select(last_selected_id);
 
 
 func _floor_changed(value: float) -> void:
@@ -193,6 +225,33 @@ func _floor_changed(value: float) -> void:
 func _item_selected(index: int) -> void:
 	var item_id := palette_list.get_item_metadata(index) as int;
 	selected_item_id = item_id;
+
+
+func _set_display_mode(mode: int) -> void:
+	if display_mode == mode:
+		return;
+	
+	display_mode = mode;
+	
+	match display_mode:
+		PaletteDisplayMode.Thumbnail:
+			thumbnail_button.pressed = true;
+			list_button.pressed = false;
+		PaletteDisplayMode.List:
+			thumbnail_button.pressed = false;
+			list_button.pressed = true;
+	
+	_update_palette(scene_map.palette);
+
+
+func _thumbnail_result(path: String, preview: Texture, small_preview: Texture, user_data: int) -> void:
+	if !preview:
+		preview = get_icon("PackedScene", "EditorIcons");
+	
+	for i in range(palette_list.get_item_count()):
+		var item_id := palette_list.get_item_metadata(i) as int;
+		if item_id == user_data:
+			palette_list.set_item_icon(i, preview);
 
 
 class ChangeItem:
