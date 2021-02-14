@@ -20,6 +20,7 @@ var edit_axis: int = Vector3.AXIS_Y;
 var edit_floor: int = 0;
 var selected_item_id: int = 0;
 var current_input_action: int = InputAction.None;
+var changed_items: Array = [];
 
 
 onready var palette_list := $Palette as ItemList;
@@ -67,6 +68,8 @@ func handle_spatial_input(camera: Camera, event: InputEvent) -> bool:
 	if !scene_map || !scene_map.palette:
 		return false;
 	
+	var undo_redo := plugin.get_undo_redo();
+	
 	var click_event := event as InputEventMouseButton;
 	if click_event:
 		if click_event.button_index == BUTTON_WHEEL_UP && click_event.shift:
@@ -88,6 +91,25 @@ func handle_spatial_input(camera: Camera, event: InputEvent) -> bool:
 			
 			return _handle_input(camera, click_event.position);
 		else:
+			if (click_event.button_index == BUTTON_LEFT && current_input_action == InputAction.Paint) \
+			|| (click_event.button_index == BUTTON_RIGHT && current_input_action == InputAction.Erase):
+				if !changed_items.empty():
+					var action := "SceneMap Paint" if current_input_action == InputAction.Paint else "SceneMap Erase";
+					undo_redo.create_action(action);
+					
+					for i in range(changed_items.size()):
+						var item := changed_items[i] as ChangeItem;
+						undo_redo.add_do_method(scene_map, "set_cell_item", item.coordinates, item.newItem);
+						
+						item = changed_items[changed_items.size() - 1 - i] as ChangeItem;
+						undo_redo.add_undo_method(scene_map, "set_cell_item", item.coordinates, item.oldItem);
+					
+					undo_redo.commit_action();
+				
+				changed_items = [];
+				current_input_action = InputAction.None;
+				return true;
+			
 			current_input_action = InputAction.None;
 	
 	var move_event := event as InputEventMouseMotion;
@@ -120,9 +142,21 @@ func _handle_input(camera: Camera, point: Vector2) -> bool:
 	
 	match current_input_action:
 		InputAction.Paint:
+			var change := ChangeItem.new();
+			change.coordinates = cell;
+			change.oldItem = scene_map.get_cell_item(cell);
+			change.newItem = selected_item_id;
+			changed_items.append(change);
+			
 			scene_map.set_cell_item(cell, selected_item_id);
 			return true;
 		InputAction.Erase:
+			var change := ChangeItem.new();
+			change.coordinates = cell;
+			change.oldItem = scene_map.get_cell_item(cell);
+			change.newItem = -1;
+			changed_items.append(change);
+			
 			scene_map.set_cell_item(cell, -1);
 			return true;
 	
@@ -159,3 +193,9 @@ func _floor_changed(value: float) -> void:
 func _item_selected(index: int) -> void:
 	var item_id := palette_list.get_item_metadata(index) as int;
 	selected_item_id = item_id;
+
+
+class ChangeItem:
+	var coordinates: Vector3;
+	var newItem: int;
+	var oldItem: int;
