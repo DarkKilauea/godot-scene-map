@@ -27,11 +27,13 @@ var selected_item_id: int = 0;
 var current_input_action: int = InputAction.None;
 var changed_items: Array = [];
 var display_mode: int = PaletteDisplayMode.Thumbnail;
+var search_text: String = "";
 
 
 onready var palette_list := $Palette as ItemList;
 onready var no_palette_warning := $NoPaletteWarning as Label;
 onready var floor_control := $Toolbar/FloorBox as SpinBox;
+onready var search_box := $SearchBar/Search as LineEdit;
 onready var thumbnail_button := $SearchBar/Thumbnail as Button;
 onready var list_button := $SearchBar/List as Button;
 
@@ -60,6 +62,7 @@ func _exit_tree() -> void:
 func _ready() -> void:
 	thumbnail_button.icon = get_icon("FileThumbnail", "EditorIcons");
 	list_button.icon = get_icon("FileList", "EditorIcons");
+	search_box.right_icon = get_icon("Search", "EditorIcons");
 
 
 func edit(p_scene_map: SceneMap) -> void:
@@ -189,10 +192,13 @@ func _update_palette(palette: ScenePalette) -> void:
 	palette_list.clear();
 	
 	if !palette:
+		search_box.text = "";
+		search_box.editable = false;
 		no_palette_warning.show();
 		palette_list.hide();
 		return;
 	
+	search_box.editable = true;
 	no_palette_warning.hide();
 	palette_list.show();
 	
@@ -208,11 +214,25 @@ func _update_palette(palette: ScenePalette) -> void:
 			palette_list.fixed_column_width = 0;
 			palette_list.fixed_icon_size = Vector2.ZERO;
 	
+	var item_count = 0;
 	var previewer := plugin.get_editor_interface().get_resource_previewer();
 	for item_id in palette.get_item_ids():
-		palette_list.add_item(palette.get_item_name(item_id));
-		palette_list.set_item_metadata(palette_list.get_item_count() - 1, item_id);
-		previewer.queue_resource_preview(palette.get_item_scene(item_id).resource_path, self, "_thumbnail_result", item_id);
+		var name := palette.get_item_name(item_id);
+		if !name || name.empty():
+			name = "#%s" % item_count;
+		
+		if !search_text.empty() && !search_text.is_subsequence_ofi(name):
+			continue;
+		
+		palette_list.add_item(name);
+		palette_list.set_item_metadata(item_count, item_id);
+		palette_list.set_item_icon(item_count, get_icon("PackedScene", "EditorIcons"));
+		
+		var scene := palette.get_item_scene(item_id);
+		if scene:
+			previewer.queue_resource_preview(scene.resource_path, self, "_thumbnail_result", item_id);
+		
+		item_count = item_count + 1;
 	
 	if last_selected_id >= 0 && palette_list.get_item_count() > 0:
 		palette_list.select(last_selected_id);
@@ -246,7 +266,7 @@ func _set_display_mode(mode: int) -> void:
 
 func _thumbnail_result(path: String, preview: Texture, small_preview: Texture, user_data: int) -> void:
 	if !preview:
-		preview = get_icon("PackedScene", "EditorIcons");
+		return;
 	
 	for i in range(palette_list.get_item_count()):
 		var item_id := palette_list.get_item_metadata(i) as int;
@@ -258,3 +278,11 @@ class ChangeItem:
 	var coordinates: Vector3;
 	var newItem: int;
 	var oldItem: int;
+
+
+func _search_text_changed(new_text: String) -> void:
+	if search_text == new_text:
+		return;
+	
+	search_text = new_text.strip_edges() if new_text else "";
+	_update_palette(scene_map.palette);

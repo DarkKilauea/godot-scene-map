@@ -91,6 +91,7 @@ align = 1
 valign = 1
 autowrap = true
 [connection signal="value_changed" from="Toolbar/FloorBox" to="." method="_floor_changed"]
+[connection signal="text_changed" from="SearchBar/Search" to="." method="_search_text_changed"]
 [connection signal="pressed" from="SearchBar/Thumbnail" to="." method="_set_display_mode" binds= [ 0 ]]
 [connection signal="pressed" from="SearchBar/List" to="." method="_set_display_mode" binds= [ 1 ]]
 [connection signal="item_selected" from="Palette" to="." method="_item_selected"]
