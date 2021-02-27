@@ -1,4 +1,5 @@
 tool
+class_name ScenePalette, "scene_palette.svg"
 extends Resource
 
 

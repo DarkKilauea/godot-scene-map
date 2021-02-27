@@ -1,4 +1,5 @@
 tool
+class_name SceneMap, "scene_map.svg"
 extends Spatial
 
 
