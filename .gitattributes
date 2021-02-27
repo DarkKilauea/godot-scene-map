@@ -11,4 +11,11 @@
 /CHANGELOG.md export-ignore
 /CONTRIBUTING.md export-ignore
 /icon.png export-ignore
+/icon.png.import export-ignore
 /icon.svg export-ignore
+/tiles/ export-ignore
+/default_env.tres export-ignore
+/project.godot export-ignore
+/test_level.tscn export-ignore
+/test_mesh_library.tres export-ignore
+/test_scene_palette.tres export-ignore
