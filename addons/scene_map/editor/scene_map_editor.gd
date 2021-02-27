@@ -17,6 +17,14 @@ enum InputAction {
 	Erase
 }
 
+enum MenuOption {
+	PreviousLevel,
+	NextLevel,
+	EditAxis_X,
+	EditAxis_Y,
+	EditAxis_Z
+}
+
 
 var plugin: EditorPlugin;
 var scene_map: SceneMap;
@@ -33,7 +41,9 @@ var search_text: String = "";
 
 onready var palette_list := $Palette as ItemList;
 onready var no_palette_warning := $NoPaletteWarning as Label;
+onready var floor_label := $Toolbar/FloorLabel as Label;
 onready var floor_control := $Toolbar/FloorBox as SpinBox;
+onready var menu := $Toolbar/MenuButton as MenuButton;
 onready var search_box := $SearchBar/Search as LineEdit;
 onready var thumbnail_button := $SearchBar/Thumbnail as Button;
 onready var list_button := $SearchBar/List as Button;
@@ -64,6 +74,15 @@ func _ready() -> void:
 	thumbnail_button.icon = get_icon("FileThumbnail", "EditorIcons");
 	list_button.icon = get_icon("FileList", "EditorIcons");
 	search_box.right_icon = get_icon("Search", "EditorIcons");
+	
+	# Menu setup (can't be done in scene)
+	var menu_popup := menu.get_popup();
+	menu_popup.connect("id_pressed", self, "_menu_option_selected");
+	menu_popup.set_item_accelerator(menu_popup.get_item_index(MenuOption.PreviousLevel), KEY_Q);
+	menu_popup.set_item_accelerator(menu_popup.get_item_index(MenuOption.NextLevel), KEY_E);
+	menu_popup.set_item_accelerator(menu_popup.get_item_index(MenuOption.EditAxis_X), KEY_X);
+	menu_popup.set_item_accelerator(menu_popup.get_item_index(MenuOption.EditAxis_Y), KEY_Y);
+	menu_popup.set_item_accelerator(menu_popup.get_item_index(MenuOption.EditAxis_Z), KEY_Z);
 
 
 func edit(p_scene_map: SceneMap) -> void:
@@ -261,6 +280,37 @@ func _floor_changed(value: float) -> void:
 func _item_selected(index: int) -> void:
 	var item_id := palette_list.get_item_metadata(index) as int;
 	selected_item_id = item_id;
+
+
+func _menu_option_selected(option_id: int) -> void:
+	match option_id:
+		MenuOption.PreviousLevel:
+			floor_control.value -= 1;
+		MenuOption.NextLevel:
+			floor_control.value += 1;
+		MenuOption.EditAxis_X, MenuOption.EditAxis_Y, MenuOption.EditAxis_Z:
+			var base_option := MenuOption.EditAxis_X as int;
+			var new_axis := option_id - base_option;
+			
+			# Check the newly selected option
+			for i in range(3):
+				var idx := menu.get_popup().get_item_index(base_option + i);
+				menu.get_popup().set_item_checked(idx, i == new_axis);
+			
+			# Update the text of the floor selector to match the current edit mode.
+			var next_level_item := menu.get_popup().get_item_index(MenuOption.NextLevel);
+			var prev_level_item := menu.get_popup().get_item_index(MenuOption.PreviousLevel);
+			
+			if new_axis == Vector3.AXIS_Y:
+				menu.get_popup().set_item_text(next_level_item, tr("Next Floor"));
+				menu.get_popup().set_item_text(prev_level_item, tr("Previous Floor"));
+				floor_label.text = tr("Floor:");
+			else:
+				menu.get_popup().set_item_text(next_level_item, tr("Next Plane"));
+				menu.get_popup().set_item_text(prev_level_item, tr("Previous Plane"));
+				floor_label.text = tr("Plane:");
+			
+			edit_axis = new_axis;
 
 
 func _set_display_mode(mode: int) -> void:
