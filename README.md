@@ -20,7 +20,7 @@ This repository only contains the add-on and development resources.  A demonstra
 - Navigate to the **AssetLib** tab at the top of the editor and search for
   "SceneMap".
 - Install the
-  [SceneMap](https://godotengine.org/asset-library/asset/3089)
+  [SceneMap](https://godotengine.org/asset-library/asset/878)
   plugin. Keep all files inside the `/addons/scene_map/` directory checked during installation.
 - In the editor, open **Project > Project Settings**, go to **Plugins**
   and enable the **SceneMap** plugin.
