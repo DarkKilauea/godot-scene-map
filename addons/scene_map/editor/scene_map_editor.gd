@@ -21,6 +21,7 @@ enum InputAction {
 var plugin: EditorPlugin;
 var scene_map: SceneMap;
 var cursor: MeshInstance;
+var cursor_origin: Vector3;
 var edit_axis: int = Vector3.AXIS_Y;
 var edit_floor: int = 0;
 var selected_item_id: int = 0;
@@ -136,17 +137,29 @@ func handle_spatial_input(camera: Camera, event: InputEvent) -> bool:
 
 
 func _handle_input(camera: Camera, point: Vector2) -> bool:
+	var frustum := camera.get_frustum();
 	var from := camera.project_ray_origin(point);
 	var normal := camera.project_ray_normal(point);
+
+	# Convert from global space to the local space of the scene map.
+	var to_local_transform = scene_map.global_transform.affine_inverse();
+	from = to_local_transform.xform(from);
+	normal = to_local_transform.basis.xform(normal).normalized();
 	
 	var plane := Plane();
 	plane.normal[edit_axis] = 1.0;
 	plane.d = edit_floor * scene_map.cell_size[edit_axis];
 	
-	var hit := plane.intersects_ray(from, normal);
+	var hit := plane.intersects_segment(from, normal * camera.far);
 	if !hit:
 		return false;
 	
+	# Make sure the point is still visible by the camera to avoid painting on areas outside of the camera's view.
+	for frustum_plane in frustum:
+		var local_plane := to_local_transform.xform(frustum_plane) as Plane;
+		if local_plane.is_point_over(hit):
+			return false;
+
 	var cell := Vector3();
 	for i in range(3):
 		if i == edit_axis:
@@ -154,7 +167,8 @@ func _handle_input(camera: Camera, point: Vector2) -> bool:
 		else:
 			cell[i] = floor(hit[i] / scene_map.cell_size[i]);
 	
-	_update_cursor_location(cell);
+	cursor_origin = scene_map.get_global_cell_position(cell);
+	_update_cursor_transform();
 	
 	match current_input_action:
 		InputAction.Paint:
@@ -179,11 +193,13 @@ func _handle_input(camera: Camera, point: Vector2) -> bool:
 	return false;
 
 
-func _update_cursor_location(cell: Vector3) -> void:
-	var cell_location := scene_map.get_global_cell_position(cell);
+func _update_cursor_transform() -> void:
+	var transform := Transform();
+	transform.origin = cursor_origin;
+	transform.basis = transform.basis.scaled(scene_map.cell_size);
+	transform = scene_map.global_transform * transform;
 	
-	cursor.scale = scene_map.cell_size;
-	cursor.global_transform.origin = cell_location;
+	cursor.transform = transform;
 
 
 func _update_palette(palette: ScenePalette) -> void:
