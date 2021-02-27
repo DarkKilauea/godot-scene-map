@@ -202,7 +202,9 @@ func _place_instance(coordinate: Vector3, item_id: int) -> bool:
 		return false;
 	
 	var node := scene.instance(PackedScene.GEN_EDIT_STATE_INSTANCE if Engine.editor_hint else PackedScene.GEN_EDIT_STATE_DISABLED);
-	node.name = palette.get_item_name(item_id);
+	var item_name := palette.get_item_name(item_id);
+	if item_name:
+		node.name = item_name;
 	
 	var spatial := node as Spatial;
 	if spatial:

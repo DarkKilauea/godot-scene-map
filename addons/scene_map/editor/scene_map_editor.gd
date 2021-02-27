@@ -28,11 +28,11 @@ enum MenuOption {
 
 var plugin: EditorPlugin;
 var scene_map: SceneMap;
-var cursor: MeshInstance;
+var cursor: Spatial;
 var cursor_origin: Vector3;
 var edit_axis: int = Vector3.AXIS_Y;
 var edit_floor: int = 0;
-var selected_item_id: int = 0;
+var selected_item_id: int = -1;
 var current_input_action: int = InputAction.None;
 var changed_items: Array = [];
 var display_mode: int = PaletteDisplayMode.Thumbnail;
@@ -50,24 +50,13 @@ onready var list_button := $SearchBar/List as Button;
 
 
 func _enter_tree() -> void:
-	var cursor_material := SpatialMaterial.new();
-	cursor_material.albedo_color = Color(0.7, 0.7, 1.0, 0.2);
-	cursor_material.flags_unshaded = true;
-	cursor_material.flags_transparent = true;
-	
-	var cursor_mesh := CubeMesh.new();
-	cursor_mesh.size = Vector3(1, 1, 1);
-	cursor_mesh.material = cursor_material;
-	
-	cursor = MeshInstance.new();
-	cursor.mesh = cursor_mesh;
-	self.add_child(cursor);
-	cursor.hide();
+	pass;
 
 
 func _exit_tree() -> void:
-	cursor.queue_free();
-	cursor = null;
+	if cursor:
+		cursor.queue_free();
+		cursor = null;
 
 
 func _ready() -> void:
@@ -94,10 +83,8 @@ func edit(p_scene_map: SceneMap) -> void:
 	if scene_map:
 		scene_map.connect("palette_changed", self, "_update_palette");
 		_update_palette(scene_map.palette);
-		cursor.visible = true;
 	else:
 		_update_palette(null);
-		cursor.visible = false;
 
 
 func handle_spatial_input(camera: Camera, event: InputEvent) -> bool:
@@ -141,10 +128,10 @@ func handle_spatial_input(camera: Camera, event: InputEvent) -> bool:
 						undo_redo.add_undo_method(scene_map, "set_cell_item", item.coordinates, item.oldItem);
 					
 					undo_redo.commit_action();
-				
-				changed_items = [];
-				current_input_action = InputAction.None;
-				return true;
+					
+					changed_items = [];
+					current_input_action = InputAction.None;
+					return true;
 			
 			current_input_action = InputAction.None;
 	
@@ -156,6 +143,9 @@ func handle_spatial_input(camera: Camera, event: InputEvent) -> bool:
 
 
 func _handle_input(camera: Camera, point: Vector2) -> bool:
+	if !cursor:
+		return false;
+	
 	var frustum := camera.get_frustum();
 	var from := camera.project_ray_origin(point);
 	var normal := camera.project_ray_normal(point);
@@ -213,12 +203,29 @@ func _handle_input(camera: Camera, point: Vector2) -> bool:
 
 
 func _update_cursor_transform() -> void:
+	if !cursor:
+		return;
+	
 	var transform := Transform();
 	transform.origin = cursor_origin;
-	transform.basis = transform.basis.scaled(scene_map.cell_size);
 	transform = scene_map.global_transform * transform;
 	
 	cursor.transform = transform;
+
+
+func _update_cursor_instance() -> void:
+	if cursor:
+		cursor.queue_free();
+		cursor = null;
+	
+	if selected_item_id >= 0 && scene_map && scene_map.palette:
+		var scene := scene_map.palette.get_item_scene(selected_item_id);
+		if scene:
+			cursor = scene.instance();
+			cursor.name = "Cursor";
+			self.add_child(cursor);
+		
+		_update_cursor_transform();
 
 
 func _update_palette(palette: ScenePalette) -> void:
@@ -231,6 +238,9 @@ func _update_palette(palette: ScenePalette) -> void:
 		search_box.editable = false;
 		no_palette_warning.show();
 		palette_list.hide();
+		
+		selected_item_id = -1;
+		_update_cursor_instance();
 		return;
 	
 	search_box.editable = true;
@@ -250,6 +260,7 @@ func _update_palette(palette: ScenePalette) -> void:
 			palette_list.fixed_icon_size = Vector2.ZERO;
 	
 	var item_count = 0;
+	var selected_item_index := -1;
 	var previewer := plugin.get_editor_interface().get_resource_previewer();
 	for item_id in palette.get_item_ids():
 		var name := palette.get_item_name(item_id);
@@ -258,6 +269,9 @@ func _update_palette(palette: ScenePalette) -> void:
 		
 		if !search_text.empty() && !search_text.is_subsequence_ofi(name):
 			continue;
+		
+		if last_selected_id == item_id:
+			selected_item_index = item_count;
 		
 		palette_list.add_item(name);
 		palette_list.set_item_metadata(item_count, item_id);
@@ -269,8 +283,12 @@ func _update_palette(palette: ScenePalette) -> void:
 		
 		item_count = item_count + 1;
 	
-	if last_selected_id >= 0 && palette_list.get_item_count() > 0:
-		palette_list.select(last_selected_id);
+	if selected_item_index >= 0:
+		palette_list.select(selected_item_index);
+		_item_selected(selected_item_index);
+	elif selected_item_id >= 0:
+		selected_item_id = -1;
+		_update_cursor_instance();
 
 
 func _floor_changed(value: float) -> void:
@@ -279,7 +297,10 @@ func _floor_changed(value: float) -> void:
 
 func _item_selected(index: int) -> void:
 	var item_id := palette_list.get_item_metadata(index) as int;
-	selected_item_id = item_id;
+	
+	if selected_item_id != item_id:
+		selected_item_id = item_id;
+		_update_cursor_instance();
 
 
 func _menu_option_selected(option_id: int) -> void:

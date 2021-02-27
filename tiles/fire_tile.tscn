@@ -30,6 +30,7 @@ material/0 = null
 [node name="Particles" type="Particles" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0 )
 visibility_aabb = AABB( -1, 0, -1, 2, 2, 2 )
+local_coords = false
 process_material = SubResource( 2 )
 draw_pass_1 = SubResource( 4 )
 
