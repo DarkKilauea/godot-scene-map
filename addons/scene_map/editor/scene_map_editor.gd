@@ -32,6 +32,7 @@ var cursor: Spatial;
 var cursor_origin: Vector3;
 var edit_axis: int = Vector3.AXIS_Y;
 var edit_floor: int = 0;
+var edit_grid: MeshInstance;
 var selected_item_id: int = -1;
 var current_input_action: int = InputAction.None;
 var changed_items: Array = [];
@@ -54,6 +55,10 @@ func _enter_tree() -> void:
 
 
 func _exit_tree() -> void:
+	if edit_grid:
+		edit_grid.queue_free();
+		edit_grid = null;
+	
 	if cursor:
 		cursor.queue_free();
 		cursor = null;
@@ -77,11 +82,15 @@ func _ready() -> void:
 func edit(p_scene_map: SceneMap) -> void:
 	if scene_map:
 		scene_map.disconnect("palette_changed", self, "_update_palette");
+		scene_map.disconnect("cell_size_changed", self, "_update_grid");
+		scene_map.disconnect("cell_center_changed", self, "_update_grid");
 	
 	scene_map = p_scene_map;
 	
 	if scene_map:
 		scene_map.connect("palette_changed", self, "_update_palette");
+		scene_map.connect("cell_size_changed", self, "_update_grid");
+		scene_map.connect("cell_center_changed", self, "_update_grid");
 		_update_palette(scene_map.palette);
 	else:
 		_update_palette(null);
@@ -203,14 +212,15 @@ func _handle_input(camera: Camera, point: Vector2) -> bool:
 
 
 func _update_cursor_transform() -> void:
-	if !cursor:
-		return;
-	
 	var transform := Transform();
 	transform.origin = cursor_origin;
 	transform = scene_map.global_transform * transform;
 	
-	cursor.transform = transform;
+	if cursor:
+		cursor.transform = transform;
+	
+	if edit_grid:
+		edit_grid.transform = transform;
 
 
 func _update_cursor_instance() -> void:
@@ -241,6 +251,7 @@ func _update_palette(palette: ScenePalette) -> void:
 		
 		selected_item_id = -1;
 		_update_cursor_instance();
+		_update_grid();
 		return;
 	
 	search_box.editable = true;
@@ -289,6 +300,7 @@ func _update_palette(palette: ScenePalette) -> void:
 	elif selected_item_id >= 0:
 		selected_item_id = -1;
 		_update_cursor_instance();
+		_update_grid();
 
 
 func _floor_changed(value: float) -> void:
@@ -301,6 +313,7 @@ func _item_selected(index: int) -> void:
 	if selected_item_id != item_id:
 		selected_item_id = item_id;
 		_update_cursor_instance();
+		_update_grid();
 
 
 func _menu_option_selected(option_id: int) -> void:
@@ -332,6 +345,7 @@ func _menu_option_selected(option_id: int) -> void:
 				floor_label.text = tr("Plane:");
 			
 			edit_axis = new_axis;
+			_update_grid();
 
 
 func _set_display_mode(mode: int) -> void:
@@ -361,15 +375,70 @@ func _thumbnail_result(path: String, preview: Texture, small_preview: Texture, u
 			palette_list.set_item_icon(i, preview);
 
 
-class ChangeItem:
-	var coordinates: Vector3;
-	var newItem: int;
-	var oldItem: int;
-
-
 func _search_text_changed(new_text: String) -> void:
 	if search_text == new_text:
 		return;
 	
 	search_text = new_text.strip_edges() if new_text else "";
 	_update_palette(scene_map.palette);
+
+
+func _update_grid() -> void:
+	if edit_grid:
+		edit_grid.queue_free();
+		edit_grid = null;
+	
+	if selected_item_id < 0 || !scene_map || !scene_map.palette || is_equal_approx(scene_map.cell_size[edit_axis], 0.0):
+		return;
+	
+	var offset := Vector3();
+	if scene_map.cell_center_x:
+		offset.x -= 0.5;
+	if scene_map.cell_center_y:
+		offset.y -= 0.5;
+	if scene_map.cell_center_z:
+		offset.z -= 0.5;
+	offset *= scene_map.cell_size;
+	
+	var grid_material := preload("grid_material.tres") as ShaderMaterial;
+	var surface_tool := SurfaceTool.new();
+	surface_tool.begin(Mesh.PRIMITIVE_LINES);
+	surface_tool.set_material(grid_material);
+	
+	var radius := 64;
+	match edit_axis:
+		Vector3.AXIS_X:
+			for i in range(-radius, radius + 1, scene_map.cell_size.z):
+				surface_tool.add_vertex(Vector3(0, -radius, i) + offset);
+				surface_tool.add_vertex(Vector3(0, radius, i) + offset);
+			for i in range(-radius, radius + 1, scene_map.cell_size.y):
+				surface_tool.add_vertex(Vector3(0, i, -radius) + offset);
+				surface_tool.add_vertex(Vector3(0, i, radius) + offset);
+		Vector3.AXIS_Y:
+			for i in range(-radius, radius + 1, scene_map.cell_size.z):
+				surface_tool.add_vertex(Vector3(-radius, 0, i) + offset);
+				surface_tool.add_vertex(Vector3(radius, 0, i) + offset);
+			for i in range(-radius, radius + 1, scene_map.cell_size.x):
+				surface_tool.add_vertex(Vector3(i, 0, -radius) + offset);
+				surface_tool.add_vertex(Vector3(i, 0, radius) + offset);
+		Vector3.AXIS_Z:
+			for i in range(-radius, radius + 1, scene_map.cell_size.y):
+				surface_tool.add_vertex(Vector3(-radius, i, 0) + offset);
+				surface_tool.add_vertex(Vector3(radius, i, 0) + offset);
+			for i in range(-radius, radius + 1, scene_map.cell_size.x):
+				surface_tool.add_vertex(Vector3(i, -radius, 0) + offset);
+				surface_tool.add_vertex(Vector3(i, radius, 0) + offset);
+	
+	var mesh := surface_tool.commit();
+	edit_grid = MeshInstance.new();
+	edit_grid.mesh = mesh;
+	edit_grid.layers = 1 << 25;
+	self.add_child(edit_grid);
+	
+	_update_cursor_transform();
+
+
+class ChangeItem:
+	var coordinates: Vector3;
+	var newItem: int;
+	var oldItem: int;

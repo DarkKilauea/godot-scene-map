@@ -8,6 +8,8 @@ const INVALID_CELL_ITEM = -1;
 
 
 signal palette_changed;
+signal cell_size_changed;
+signal cell_center_changed;
 
 
 # Palette containing scenes that should be instanced in this grid.
@@ -95,24 +97,28 @@ func _set_cell_size(value: Vector3) -> void:
 	
 	if cell_size != value:
 		cell_size = value;
+		emit_signal("cell_size_changed");
 		_request_layout();
 
 
 func _set_cell_center_x(value: bool) -> void:
 	if cell_center_x != value:
 		cell_center_x = value;
+		emit_signal("cell_center_changed");
 		_request_layout();
 
 
 func _set_cell_center_y(value: bool) -> void:
 	if cell_center_y != value:
 		cell_center_y = value;
+		emit_signal("cell_center_changed");
 		_request_layout();
 
 
 func _set_cell_center_z(value: bool) -> void:
 	if cell_center_z != value:
 		cell_center_z = value;
+		emit_signal("cell_center_changed");
 		_request_layout();
 
 
