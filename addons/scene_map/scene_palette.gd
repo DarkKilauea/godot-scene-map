@@ -6,6 +6,11 @@ extends Resource
 var item_map := {};
 
 
+func _init() -> void:
+	# Set default name so it isn't set to "Resource".
+	resource_name = "ScenePalette";
+
+
 func _set(property: String, value) -> bool:
 	if property.begins_with("items/"):
 		var parts := property.split("/");
@@ -180,7 +185,7 @@ func get_next_available_id() -> int:
 
 func _emit_changed():
 	property_list_changed_notify();
-	emit_signal("changed");
+	emit_changed();
 
 
 class Item:

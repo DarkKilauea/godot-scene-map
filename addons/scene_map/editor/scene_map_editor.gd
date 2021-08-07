@@ -81,16 +81,27 @@ func _ready() -> void:
 
 func edit(p_scene_map: SceneMap) -> void:
 	if scene_map:
-		scene_map.disconnect("palette_changed", self, "_update_palette");
-		scene_map.disconnect("cell_size_changed", self, "_update_grid");
-		scene_map.disconnect("cell_center_changed", self, "_update_grid");
+		if scene_map.is_connected("palette_changed", self, "_update_palette"):
+			scene_map.disconnect("palette_changed", self, "_update_palette");
+		
+		if scene_map.is_connected("cell_size_changed", self, "_update_grid"):
+			scene_map.disconnect("cell_size_changed", self, "_update_grid");
+		
+		if scene_map.is_connected("cell_center_changed", self, "_update_grid"):
+			scene_map.disconnect("cell_center_changed", self, "_update_grid");
 	
 	scene_map = p_scene_map;
 	
 	if scene_map:
-		scene_map.connect("palette_changed", self, "_update_palette");
-		scene_map.connect("cell_size_changed", self, "_update_grid");
-		scene_map.connect("cell_center_changed", self, "_update_grid");
+		if !scene_map.is_connected("palette_changed", self, "_update_palette"):
+			scene_map.connect("palette_changed", self, "_update_palette");
+		
+		if !scene_map.is_connected("cell_size_changed", self, "_update_grid"):
+			scene_map.connect("cell_size_changed", self, "_update_grid");
+		
+		if !scene_map.is_connected("cell_center_changed", self, "_update_grid"):
+			scene_map.connect("cell_center_changed", self, "_update_grid");
+		
 		_update_palette(scene_map.palette);
 	else:
 		_update_palette(null);

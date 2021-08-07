@@ -13,7 +13,7 @@ signal cell_center_changed;
 
 
 # Palette containing scenes that should be instanced in this grid.
-var palette: ScenePalette setget _set_palette;
+var palette: ScenePalette = ScenePalette.new() setget _set_palette;
 
 # Size of each cell in the grid.  Should match the size of the scenes in the attached palette.
 var cell_size: Vector3 = Vector3(2, 2, 2) setget _set_cell_size;
@@ -47,7 +47,7 @@ func _get_property_list() -> Array:
 			"name": "palette",
 			"type": TYPE_OBJECT,
 			"hint": PROPERTY_HINT_RESOURCE_TYPE,
-			"hint_string": "ScenePalette"
+			"hint_string": "Resource"
 		},
 		{
 			"name": "Cell",
@@ -81,12 +81,12 @@ func _get_property_list() -> Array:
 
 func _set_palette(value: ScenePalette) -> void:
 	if palette != value:
-		if palette:
+		if palette && palette.is_connected("changed", self, "_on_palette_changed"):
 			palette.disconnect("changed", self, "_on_palette_changed");
 		
 		palette = value;
 		
-		if palette:
+		if palette && !palette.is_connected("changed", self, "_on_palette_changed"):
 			palette.connect("changed", self, "_on_palette_changed");
 		
 		_on_palette_changed();
