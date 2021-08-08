@@ -12,6 +12,35 @@ This repository only contains the add-on and development resources.  A demonstra
 - ScenePalette resource for grouping scenes painted into a SceneMap.
 - Editor support for "painting" scenes and managing ScenePalettes.
 
+### Comparison with GridMap
+
+| Feature                | SceneMap    | GridMap |
+| ---------------------- | :---------: | :-----: |
+| **Painting**           |             |         |
+| Paint                  | Yes         | Yes     |
+| Erase                  | Yes         | Yes     |
+| Pick From Viewport     | No          | Yes     |
+| Change Elevation       | Yes         | Yes     |
+| Edit X/Y/Z Planes      | Yes         | Yes     |
+| Rotate Cursor          | No          | Yes     |
+| **Cell Configuration** |             |         |
+| Cell Size              | Yes         | Yes     |
+| Cell Center (X/Y/Z)    | Yes         | Yes     |
+| Cell Scale Override    | Not Planned | Yes     |
+| **Selection**          |             |         | 
+| Select Region          | No          | Yes     |
+| Fill Region            | No          | Yes     |
+| Clear Region           | No          | Yes     |
+| Cut/Copy/Paste Region  | No          | Yes     |
+| **Library**            |             |         |
+| View Items             | Yes         | Yes     |
+| Select Item            | Yes         | Yes     |
+| Search Items           | Yes         | Yes     |
+| Change Preview Size    | No          | Yes     |
+| Supported Types        | Scenes      | Meshes  |
+| **Optimization**       |             |         |
+| Octant Batching        | Not Planned | Yes     |
+
 ## Installation
 
 ### Using the Asset Library

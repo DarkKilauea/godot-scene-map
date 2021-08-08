@@ -6,6 +6,7 @@
 [ext_resource path="res://tiles/fire_tile.tscn" type="PackedScene" id=4]
 
 [resource]
+resource_name = "ScenePalette"
 script = ExtResource( 1 )
 items/0/name = "Floor"
 items/0/scene = ExtResource( 2 )
