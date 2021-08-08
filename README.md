@@ -45,17 +45,17 @@ This repository only contains the add-on and development resources.  A demonstra
 
 #### 1.0
 
-- Cursor Rotation (#1)
-- Pick item from 3D viewport (#2)
-- Region Selection (#3)
+- Cursor Rotation
+- Pick item from 3D viewport
+- Region Selection
   - Fill/Clear
   - Copy/Paste
 - Versioned data format
 
 #### 1.1
 
-- Autotile support (#4)
-- Multiple layers (#5)
+- Autotile support
+- Multiple layers
 
 ## Installation
 
