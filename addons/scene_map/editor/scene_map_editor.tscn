@@ -43,7 +43,7 @@ margin_right = 230.0
 margin_bottom = 24.0
 text = "Scene Map"
 icon = ExtResource( 2 )
-items = [ "Previous Floor", null, 0, false, false, 0, 0, null, "", false, "Next Floor", null, 0, false, false, 1, 0, null, "", false, "", null, 0, false, false, -1, 0, null, "", true, "Edit X Axis", null, 2, false, false, 2, 0, null, "", false, "Edit Y Axis", null, 2, true, false, 3, 0, null, "", false, "Edit Z Axis", null, 2, false, false, 4, 0, null, "", false ]
+items = [ "Previous Floor", null, 0, false, false, 0, 81, null, "", false, "Next Floor", null, 0, false, false, 1, 69, null, "", false, "", null, 0, false, false, -1, 0, null, "", true, "Edit X Axis", null, 2, false, false, 2, 88, null, "", false, "Edit Y Axis", null, 2, true, false, 3, 89, null, "", false, "Edit Z Axis", null, 2, false, false, 4, 90, null, "", false, "", null, 0, false, false, -1, 0, null, "", true, "Rotate Clockwise", null, 0, false, false, 5, 68, null, "", false, "Rotate Counter Clockwise", null, 0, false, false, 6, 65, null, "", false, "Reset Rotation", null, 0, false, false, 7, 83, null, "", false ]
 
 [node name="SearchBar" type="HBoxContainer" parent="."]
 margin_top = 28.0

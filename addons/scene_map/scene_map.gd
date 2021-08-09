@@ -29,7 +29,7 @@ var cell_center_z: bool = true setget _set_cell_center_z;
 
 # Contains a sparse collection of filled cells with the Id of the scene in the palette.
 # key: Vector3
-# value: { itemId: int, path: NodePath }
+# value: { itemId: int, path: NodePath, orientation: Quat }
 var cell_map: Dictionary = {};
 
 # Whether a layout is currently pending.
@@ -123,29 +123,30 @@ func _set_cell_center_z(value: bool) -> void:
 
 
 # Set a cell in the map to contain the scene in the palette as indicated by item_id.
-# @param coordinate Vector3 specifying the x, y, and z coordinates of the cell.
-# @param item_id ID of the scene to place at this cell.
+# @param p_coordinate Vector3 specifying the x, y, and z coordinates of the cell.
+# @param p_item_id ID of the scene to place at this cell.
+# @param p_orientation Quaternion specifying how the item is oriented.
 # @returns True if the item was removed or placed, false if item was already present when placing.
-func set_cell_item(coordinate: Vector3, item_id: int) -> bool:
-	coordinate = coordinate.floor();
+func set_cell_item(p_coordinate: Vector3, p_item_id: int, p_orientation: Quat = Quat.IDENTITY) -> bool:
+	var coordinate = p_coordinate.floor();
 	
-	if get_cell_item(coordinate) == item_id:
+	if get_cell_item_id(coordinate) == p_item_id && get_cell_item_orientation(coordinate).is_equal_approx(p_orientation):
 		return false;
 	
-	if item_id == INVALID_CELL_ITEM:
+	if p_item_id == INVALID_CELL_ITEM:
 		return _remove_instance(coordinate);
 	else:
 		if cell_map.has(coordinate):
 			_remove_instance(coordinate);
 		
-		return _place_instance(coordinate, item_id);
+		return _place_instance(coordinate, p_item_id, p_orientation);
 
 
 # Gets the palette ID of the item at the indicated coordinates.
-# @param coordinate Vector3 specifying the x, y, and z coordinates of the cell.
+# @param p_coordinate Vector3 specifying the x, y, and z coordinates of the cell.
 # @returns ID of the item if a cell is present, -1 if not.
-func get_cell_item(coordinate: Vector3) -> int:
-	coordinate = coordinate.floor();
+func get_cell_item_id(p_coordinate: Vector3) -> int:
+	var coordinate = p_coordinate.floor();
 	
 	if cell_map.has(coordinate):
 		var data := cell_map.get(coordinate) as Dictionary;
@@ -154,8 +155,24 @@ func get_cell_item(coordinate: Vector3) -> int:
 	return INVALID_CELL_ITEM;
 
 
-func get_global_cell_position(coordinate: Vector3) -> Vector3:
-	var cell_location := coordinate;
+# Gets the saved orientation of the item at the indicated coordinates.
+# @param p_coordinate Vector3 specifying the x, y, and z coordinates of the cell.
+# @returns Quaternion specifying how the item is oriented.
+func get_cell_item_orientation(p_coordinate: Vector3) -> Quat:
+	var coordinate = p_coordinate.floor();
+	
+	if cell_map.has(coordinate):
+		var data := cell_map.get(coordinate) as Dictionary;
+		return data.orientation;
+	
+	return Quat.IDENTITY;
+
+
+# Gets the position of the cell in relation to this SceneMap.
+# @param p_coordinate Vector3 specifying the x, y, and z coordinates of the cell.
+# @returns Position of the cell in the coordinate space of the SceneMap.
+func get_cell_position(p_coordinate: Vector3) -> Vector3:
+	var cell_location := p_coordinate;
 	
 	if cell_center_x:
 		cell_location.x += 0.5;
@@ -181,7 +198,7 @@ func _layout() -> void:
 		var data := cell_map.get(coordinate) as Dictionary;
 		var spatial := get_node(data.path) as Spatial;
 		if spatial:
-			spatial.translation = get_global_cell_position(coordinate);
+			spatial.translation = get_cell_position(coordinate);
 	
 	layout_pending = false;
 
@@ -201,7 +218,7 @@ func _remove_instance(coordinate: Vector3) -> bool:
 	return true;
 
 
-func _place_instance(coordinate: Vector3, item_id: int) -> bool:
+func _place_instance(coordinate: Vector3, item_id: int, orientation: Quat) -> bool:
 	var scene := palette.get_item_scene(item_id);
 	if !scene:
 		push_error("Missing scene for item %s at cell %s" % [item_id, coordinate]);
@@ -214,7 +231,7 @@ func _place_instance(coordinate: Vector3, item_id: int) -> bool:
 	
 	var spatial := node as Spatial;
 	if spatial:
-		spatial.translation = get_global_cell_position(coordinate);
+		spatial.transform = Transform(Basis(orientation), get_cell_position(coordinate));
 	
 	self.add_child(node, true);
 	
@@ -228,7 +245,8 @@ func _place_instance(coordinate: Vector3, item_id: int) -> bool:
 	
 	cell_map[coordinate] = {
 		"itemId": item_id,
-		"path": self.get_path_to(node)
+		"path": self.get_path_to(node),
+		"orientation": orientation
 	};
 	
 	return true;
@@ -239,9 +257,10 @@ func _rebuild() -> void:
 	for cell in cells:
 		var data := cell_map.get(cell) as Dictionary;
 		var item_id := data.itemId as int;
+		var orientation := data.orientation as Quat;
 		
 		_remove_instance(cell);
-		_place_instance(cell, item_id);
+		_place_instance(cell, item_id, orientation);
 
 
 func _on_palette_changed():

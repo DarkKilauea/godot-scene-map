@@ -4,6 +4,7 @@ extends Control
 
 const SceneMap = preload("../scene_map.gd");
 const ScenePalette = preload("../scene_palette.gd");
+const RotateStep = PI / 4.0; # 45 degrees
 
 
 enum PaletteDisplayMode {
@@ -22,7 +23,10 @@ enum MenuOption {
 	NextLevel,
 	EditAxis_X,
 	EditAxis_Y,
-	EditAxis_Z
+	EditAxis_Z,
+	Rotate_Clockwise,
+	Rotate_Counter_Clockwise,
+	Rotate_Reset
 }
 
 
@@ -30,6 +34,7 @@ var plugin: EditorPlugin;
 var scene_map: SceneMap;
 var cursor: Spatial;
 var cursor_origin: Vector3;
+var cursor_rotation: Basis;
 var edit_axis: int = Vector3.AXIS_Y;
 var edit_floor: int = 0;
 var edit_grid: MeshInstance;
@@ -77,6 +82,9 @@ func _ready() -> void:
 	menu_popup.set_item_accelerator(menu_popup.get_item_index(MenuOption.EditAxis_X), KEY_X);
 	menu_popup.set_item_accelerator(menu_popup.get_item_index(MenuOption.EditAxis_Y), KEY_Y);
 	menu_popup.set_item_accelerator(menu_popup.get_item_index(MenuOption.EditAxis_Z), KEY_Z);
+	menu_popup.set_item_accelerator(menu_popup.get_item_index(MenuOption.Rotate_Clockwise), KEY_D);
+	menu_popup.set_item_accelerator(menu_popup.get_item_index(MenuOption.Rotate_Counter_Clockwise), KEY_A);
+	menu_popup.set_item_accelerator(menu_popup.get_item_index(MenuOption.Rotate_Reset), KEY_S);
 
 
 func edit(p_scene_map: SceneMap) -> void:
@@ -142,10 +150,10 @@ func handle_spatial_input(camera: Camera, event: InputEvent) -> bool:
 					
 					for i in range(changed_items.size()):
 						var item := changed_items[i] as ChangeItem;
-						undo_redo.add_do_method(scene_map, "set_cell_item", item.coordinates, item.newItem);
+						undo_redo.add_do_method(scene_map, "set_cell_item", item.coordinates, item.new_item, item.new_orientation);
 						
 						item = changed_items[changed_items.size() - 1 - i] as ChangeItem;
-						undo_redo.add_undo_method(scene_map, "set_cell_item", item.coordinates, item.oldItem);
+						undo_redo.add_undo_method(scene_map, "set_cell_item", item.coordinates, item.old_item, item.old_orientation);
 					
 					undo_redo.commit_action();
 					
@@ -196,40 +204,51 @@ func _handle_input(camera: Camera, point: Vector2) -> bool:
 		else:
 			cell[i] = floor(hit[i] / scene_map.cell_size[i]);
 	
-	cursor_origin = scene_map.get_global_cell_position(cell);
+	cursor_origin = scene_map.get_cell_position(cell);
 	_update_cursor_transform();
+	_update_edit_grid_transform();
 	
 	match current_input_action:
 		InputAction.Paint:
 			var change := ChangeItem.new();
 			change.coordinates = cell;
-			change.oldItem = scene_map.get_cell_item(cell);
-			change.newItem = selected_item_id;
+			change.old_item = scene_map.get_cell_item_id(cell);
+			change.old_orientation = scene_map.get_cell_item_orientation(cell);
+			change.new_item = selected_item_id;
+			change.new_orientation = cursor_rotation.get_rotation_quat();
 			changed_items.append(change);
 			
-			scene_map.set_cell_item(cell, selected_item_id);
+			scene_map.set_cell_item(change.coordinates, change.new_item, change.new_orientation);
 			return true;
 		InputAction.Erase:
 			var change := ChangeItem.new();
 			change.coordinates = cell;
-			change.oldItem = scene_map.get_cell_item(cell);
-			change.newItem = -1;
+			change.old_item = scene_map.get_cell_item_id(cell);
+			change.old_orientation = scene_map.get_cell_item_orientation(cell);
+			change.new_item = -1;
+			change.new_orientation = Quat.IDENTITY;
 			changed_items.append(change);
 			
-			scene_map.set_cell_item(cell, -1);
+			scene_map.set_cell_item(change.coordinates, change.new_item, change.new_orientation);
 			return true;
 	
 	return false;
 
 
 func _update_cursor_transform() -> void:
-	var transform := Transform();
+	var transform := Transform(cursor_rotation);
 	transform.origin = cursor_origin;
 	transform = scene_map.global_transform * transform;
 	
 	if cursor:
 		cursor.transform = transform;
-	
+
+
+func _update_edit_grid_transform() -> void:
+	var transform := Transform();
+	transform.origin = cursor_origin;
+	transform = scene_map.global_transform * transform;
+
 	if edit_grid:
 		edit_grid.transform = transform;
 
@@ -357,6 +376,16 @@ func _menu_option_selected(option_id: int) -> void:
 			
 			edit_axis = new_axis;
 			_update_grid();
+		MenuOption.Rotate_Clockwise, MenuOption.Rotate_Counter_Clockwise:
+			var clockwise: bool = option_id == MenuOption.Rotate_Clockwise;
+			var axis := Vector3();
+			axis[edit_axis] = 1.0;
+			
+			cursor_rotation = cursor_rotation.rotated(axis, -RotateStep if clockwise else RotateStep);
+			_update_cursor_transform();
+		MenuOption.Rotate_Reset:
+			cursor_rotation = Basis.IDENTITY;
+			_update_cursor_transform();
 
 
 func _set_display_mode(mode: int) -> void:
@@ -446,10 +475,12 @@ func _update_grid() -> void:
 	edit_grid.layers = 1 << 25;
 	self.add_child(edit_grid);
 	
-	_update_cursor_transform();
+	_update_edit_grid_transform();
 
 
 class ChangeItem:
 	var coordinates: Vector3;
-	var newItem: int;
-	var oldItem: int;
+	var new_item: int;
+	var new_orientation: Quat;
+	var old_item: int;
+	var old_orientation: Quat;

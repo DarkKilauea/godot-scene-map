@@ -1,9 +1,10 @@
-[gd_resource type="Resource" load_steps=5 format=2]
+[gd_resource type="Resource" load_steps=6 format=2]
 
 [ext_resource path="res://addons/scene_map/scene_palette.gd" type="Script" id=1]
 [ext_resource path="res://tiles/floor_tile.tscn" type="PackedScene" id=2]
 [ext_resource path="res://tiles/block_tile.tscn" type="PackedScene" id=3]
 [ext_resource path="res://tiles/fire_tile.tscn" type="PackedScene" id=4]
+[ext_resource path="res://tiles/triangle_tile.tscn" type="PackedScene" id=5]
 
 [resource]
 resource_name = "ScenePalette"
@@ -14,3 +15,5 @@ items/1/name = "Block"
 items/1/scene = ExtResource( 3 )
 items/2/name = "Fire Floor"
 items/2/scene = ExtResource( 4 )
+items/3/name = "Triangle"
+items/3/scene = ExtResource( 5 )
