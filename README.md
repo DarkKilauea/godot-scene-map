@@ -6,6 +6,8 @@ This repository only contains the add-on and development resources.  A demonstra
 
 *WARNING: This addon is still in preview and is not recommended for production use.*
 
+![Image of SceneMap Editor](docs/images/scene_map_editor.png)
+
 ## Features
 
 - SceneMap node with a similar feature set to GridMap.
