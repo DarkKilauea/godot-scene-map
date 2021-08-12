@@ -374,7 +374,10 @@ func _menu_option_selected(option_id: int) -> void:
 				menu.get_popup().set_item_text(prev_level_item, tr("Previous Plane"));
 				floor_label.text = tr("Plane:");
 			
+			# Try to keep the cursor in the same location in the new axis
 			edit_axis = new_axis;
+			floor_control.value = floor(cursor_origin[edit_axis] / scene_map.cell_size[edit_axis]);
+			
 			_update_grid();
 		MenuOption.Rotate_Clockwise, MenuOption.Rotate_Counter_Clockwise:
 			var clockwise: bool = option_id == MenuOption.Rotate_Clockwise;
