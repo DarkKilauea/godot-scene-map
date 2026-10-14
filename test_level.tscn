@@ -1,310 +1,133 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene format=3 uid="uid://pj0jq5yw7n8l"]
 
-[ext_resource path="res://addons/scene_map/scene_map.gd" type="Script" id=1]
-[ext_resource path="res://test_mesh_library.tres" type="MeshLibrary" id=2]
-[ext_resource path="res://test_scene_palette.tres" type="Resource" id=3]
-[ext_resource path="res://tiles/floor_tile.tscn" type="PackedScene" id=4]
-[ext_resource path="res://tiles/block_tile.tscn" type="PackedScene" id=5]
-[ext_resource path="res://tiles/fire_tile.tscn" type="PackedScene" id=6]
-[ext_resource path="res://tiles/triangle_tile.tscn" type="PackedScene" id=7]
+[ext_resource type="Script" uid="uid://di7lufebwfcmf" path="res://addons/scene_map/scene_map.gd" id="1"]
+[ext_resource type="MeshLibrary" uid="uid://5s2fwd0hu56e" path="res://test_mesh_library.tres" id="2"]
+[ext_resource type="Resource" uid="uid://bspblu1fnvlhu" path="res://test_scene_palette.tres" id="3_y646j"]
+[ext_resource type="PackedScene" path="res://tiles/floor_tile.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://tiles/block_tile.tscn" id="5"]
+[ext_resource type="PackedScene" uid="uid://baagc1mix2la6" path="res://tiles/fire_tile.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://tiles/triangle_tile.tscn" id="7"]
 
-[sub_resource type="SpatialMaterial" id=1]
-albedo_color = Color( 0, 0, 0, 1 )
+[node name="Spatial" type="Node3D" unique_id=486782438]
 
-[node name="Spatial" type="Spatial"]
-
-[node name="GridMap" type="GridMap" parent="."]
-mesh_library = ExtResource( 2 )
+[node name="GridMap" type="GridMap" parent="." unique_id=1314726561]
+mesh_library = ExtResource("2")
 data = {
-"cells": PoolIntArray( 65533, 65533, 0, 65534, 65533, 0, 65535, 65533, 0, 131069, 65533, 1, 131071, 65533, 1, 65533, 65534, 0, 65534, 65534, 0, 65535, 65534, 0, 131070, 65534, 0, 131071, 65534, 0, 196606, 65534, 1, 65533, 65535, 0, 65534, 65535, 0, 65535, 65535, 0, 131069, 65535, 1, 131070, 65535, 0, 131071, 65535, 0, 196607, 65535, 0 )
-}
-__meta__ = {
-"_edit_lock_": true,
-"_editor_clip_": 0,
-"_editor_floor_": Vector3( 0, 0, 0 )
+"cells": PackedInt32Array(65533, 65533, 0, 65534, 65533, 0, 65535, 65533, 0, 131069, 65533, 1, 131071, 65533, 1, 65533, 65534, 0, 65534, 65534, 0, 65535, 65534, 0, 131070, 65534, 0, 131071, 65534, 0, 196606, 65534, 1, 65533, 65535, 0, 65534, 65535, 0, 65535, 65535, 0, 131069, 65535, 1, 131070, 65535, 0, 131071, 65535, 0, 196607, 65535, 0)
 }
 
-[node name="SceneMap" type="Spatial" parent="."]
-script = ExtResource( 1 )
-__meta__ = {
-"_edit_lock_": true
-}
-palette = ExtResource( 3 )
-cell_size = Vector3( 2, 2, 2 )
-cell_center_x = true
-cell_center_y = true
-cell_center_z = true
-cell_map = {
-Vector3( 4, 0, 0 ): {
-"itemId": 3,
-"orientation": Quat( 0, -0.707107, 0, 0.707107 ),
-"path": NodePath("Triangle10")
-},
-Vector3( 4, 0, 2 ): {
-"itemId": 3,
-"orientation": Quat( 0, -0.707107, 0, 0.707107 ),
-"path": NodePath("Triangle11")
-},
-Vector3( 4, 0, 4 ): {
-"itemId": 3,
-"orientation": Quat( 0, -0.707107, 0, 0.707107 ),
-"path": NodePath("Triangle12")
-},
-Vector3( 5, 0, -1 ): {
-"itemId": 3,
-"orientation": Quat( 0, 1, 0, 0 ),
-"path": NodePath("Triangle9")
-},
-Vector3( 5, 0, 0 ): {
-"itemId": 1,
-"path": NodePath("Block9")
-},
-Vector3( 5, 0, 1 ): {
-"itemId": 1,
-"path": NodePath("Block10")
-},
-Vector3( 5, 0, 2 ): {
-"itemId": 1,
-"path": NodePath("Block11")
-},
-Vector3( 5, 0, 3 ): {
-"itemId": 1,
-"path": NodePath("Block12")
-},
-Vector3( 5, 0, 4 ): {
-"itemId": 1,
-"path": NodePath("Block13")
-},
-Vector3( 5, 0, 5 ): {
-"itemId": 3,
-"orientation": Quat( 0, 0, 0, 1 ),
-"path": NodePath("Triangle")
-},
-Vector3( 6, 0, 0 ): {
-"itemId": 1,
-"path": NodePath("Block8")
-},
-Vector3( 6, 0, 1 ): {
-"itemId": 0,
-"path": NodePath("Floor17")
-},
-Vector3( 6, 0, 2 ): {
-"itemId": 0,
-"path": NodePath("Floor14")
-},
-Vector3( 6, 0, 3 ): {
-"itemId": 0,
-"path": NodePath("Floor7")
-},
-Vector3( 6, 0, 4 ): {
-"itemId": 1,
-"path": NodePath("Block14")
-},
-Vector3( 7, 0, -1 ): {
-"itemId": 3,
-"orientation": Quat( 0, 1, 0, 0 ),
-"path": NodePath("Triangle8")
-},
-Vector3( 7, 0, 0 ): {
-"itemId": 1,
-"path": NodePath("Block7")
-},
-Vector3( 7, 0, 1 ): {
-"itemId": 0,
-"path": NodePath("Floor18")
-},
-Vector3( 7, 0, 2 ): {
-"itemId": 2,
-"path": NodePath("Fire Floor")
-},
-Vector3( 7, 0, 3 ): {
-"itemId": 0,
-"path": NodePath("Floor8")
-},
-Vector3( 7, 0, 4 ): {
-"itemId": 1,
-"path": NodePath("Block15")
-},
-Vector3( 7, 0, 5 ): {
-"itemId": 3,
-"orientation": Quat( 0, 0, 0, 1 ),
-"path": NodePath("Triangle2")
-},
-Vector3( 8, 0, 0 ): {
-"itemId": 1,
-"path": NodePath("Block6")
-},
-Vector3( 8, 0, 1 ): {
-"itemId": 0,
-"path": NodePath("Floor19")
-},
-Vector3( 8, 0, 2 ): {
-"itemId": 0,
-"path": NodePath("Floor12")
-},
-Vector3( 8, 0, 3 ): {
-"itemId": 0,
-"path": NodePath("Floor9")
-},
-Vector3( 8, 0, 4 ): {
-"itemId": 1,
-"path": NodePath("Block16")
-},
-Vector3( 9, 0, -1 ): {
-"itemId": 3,
-"orientation": Quat( 0, 1, 0, 0 ),
-"path": NodePath("Triangle7")
-},
-Vector3( 9, 0, 0 ): {
-"itemId": 1,
-"path": NodePath("Block5")
-},
-Vector3( 9, 0, 1 ): {
-"itemId": 1,
-"path": NodePath("Block4")
-},
-Vector3( 9, 0, 2 ): {
-"itemId": 1,
-"path": NodePath("Block3")
-},
-Vector3( 9, 0, 3 ): {
-"itemId": 1,
-"path": NodePath("Block2")
-},
-Vector3( 9, 0, 4 ): {
-"itemId": 1,
-"path": NodePath("Block")
-},
-Vector3( 9, 0, 5 ): {
-"itemId": 3,
-"orientation": Quat( 0, 0, 0, 1 ),
-"path": NodePath("Triangle3")
-},
-Vector3( 10, 0, 0 ): {
-"itemId": 3,
-"orientation": Quat( 0, 0.707107, 0, 0.707107 ),
-"path": NodePath("Triangle6")
-},
-Vector3( 10, 0, 2 ): {
-"itemId": 3,
-"orientation": Quat( 0, 0.707107, 0, 0.707107 ),
-"path": NodePath("Triangle5")
-},
-Vector3( 10, 0, 4 ): {
-"itemId": 3,
-"orientation": Quat( 0, 0.707107, 0, 0.707107 ),
-"path": NodePath("Triangle4")
-}
-}
+[node name="SceneMap" type="Node3D" parent="." unique_id=696092525]
+script = ExtResource("1")
+palette = ExtResource("3_y646j")
+layers/0/size = Vector3(2, 2, 2)
+layers/0/center_x = true
+layers/0/center_y = true
+layers/0/center_z = true
+layers/0/cell_map = null
+layers/1/size = Vector3(2, 2, 2)
+layers/1/center_x = true
+layers/1/center_y = true
+layers/1/center_z = true
+layers/1/cell_map = null
 
-[node name="Floor7" parent="SceneMap" instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 1, 7 )
+[node name="fire_tile" parent="SceneMap" unique_id=2044379638 instance=ExtResource("6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 1, 3)
 
-[node name="Floor8" parent="SceneMap" instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1, 7 )
+[node name="floor" parent="SceneMap" unique_id=1677165741 instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1, 3)
 
-[node name="Floor9" parent="SceneMap" instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 1, 7 )
+[node name="floor2" parent="SceneMap" unique_id=1424199000 instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1, 1)
 
-[node name="Floor12" parent="SceneMap" instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 1, 5 )
+[node name="floor4" parent="SceneMap" unique_id=279091421 instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 1, 1)
 
-[node name="Floor14" parent="SceneMap" instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 1, 5 )
+[node name="floor5" parent="SceneMap" unique_id=836186530 instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1, 1)
 
-[node name="Floor17" parent="SceneMap" instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 1, 3 )
+[node name="floor9" parent="SceneMap" unique_id=302587791 instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1, 5)
 
-[node name="Floor18" parent="SceneMap" instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1, 3 )
+[node name="floor10" parent="SceneMap" unique_id=2089055629 instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 1, 5)
 
-[node name="Floor19" parent="SceneMap" instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 1, 3 )
+[node name="floor11" parent="SceneMap" unique_id=1886231699 instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1, 5)
 
-[node name="Block" parent="SceneMap" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 1, 9 )
+[node name="floor12" parent="SceneMap" unique_id=484618602 instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1, 3)
 
-[node name="Block2" parent="SceneMap" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 1, 7 )
+[node name="floor3" parent="SceneMap" unique_id=1028312416 instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 1, 5)
 
-[node name="Block3" parent="SceneMap" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 1, 5 )
+[node name="floor6" parent="SceneMap" unique_id=10332321 instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 1, 5)
 
-[node name="Block4" parent="SceneMap" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 1, 3 )
+[node name="floor7" parent="SceneMap" unique_id=584639732 instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 1, 7)
 
-[node name="Block5" parent="SceneMap" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 1, 1 )
+[node name="floor8" parent="SceneMap" unique_id=850280861 instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1, -1)
 
-[node name="Block6" parent="SceneMap" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 1, 1 )
+[node name="floor13" parent="SceneMap" unique_id=849784070 instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 1, -1)
 
-[node name="Block7" parent="SceneMap" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1, 1 )
+[node name="floor14" parent="SceneMap" unique_id=1188574145 instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 1, 3)
 
-[node name="Block8" parent="SceneMap" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 1, 1 )
+[node name="block" parent="SceneMap" unique_id=963227882 instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1, 1)
 
-[node name="Block9" parent="SceneMap" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1, 1 )
+[node name="block3" parent="SceneMap" unique_id=1976506036 instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1, 5)
 
-[node name="Block10" parent="SceneMap" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1, 3 )
-material/0 = SubResource( 1 )
+[node name="block4" parent="SceneMap" unique_id=1237415232 instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 1, 5)
 
-[node name="Block11" parent="SceneMap" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1, 5 )
+[node name="block5" parent="SceneMap" unique_id=1816801363 instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1, 5)
 
-[node name="Block12" parent="SceneMap" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1, 7 )
+[node name="block6" parent="SceneMap" unique_id=1082363171 instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1, 1)
 
-[node name="Block13" parent="SceneMap" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1, 9 )
+[node name="block7" parent="SceneMap" unique_id=572291504 instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1, 3)
 
-[node name="Block14" parent="SceneMap" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 1, 9 )
+[node name="block8" parent="SceneMap" unique_id=1662589717 instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1, 3)
 
-[node name="Block15" parent="SceneMap" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1, 9 )
+[node name="block9" parent="SceneMap" unique_id=63885997 instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 1, 3)
 
-[node name="Block16" parent="SceneMap" instance=ExtResource( 5 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 1, 9 )
+[node name="block10" parent="SceneMap" unique_id=557063043 instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 1, 3)
 
-[node name="Fire Floor" parent="SceneMap" instance=ExtResource( 6 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1, 5 )
+[node name="block11" parent="SceneMap" unique_id=827239562 instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 1, -1)
 
-[node name="Triangle" parent="SceneMap" instance=ExtResource( 7 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 1, 11 )
+[node name="block12" parent="SceneMap" unique_id=1467160653 instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 1, 7)
 
-[node name="Triangle2" parent="SceneMap" instance=ExtResource( 7 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1, 11 )
+[node name="triangle" parent="SceneMap" unique_id=1903033150 instance=ExtResource("7")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 13, 1, -3)
 
-[node name="Triangle3" parent="SceneMap" instance=ExtResource( 7 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 1, 11 )
+[node name="triangle2" parent="SceneMap" unique_id=1811411625 instance=ExtResource("7")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 19, 1, 3)
 
-[node name="Triangle4" parent="SceneMap" instance=ExtResource( 7 )]
-transform = Transform( 0, 0, 1, 0, 1, 0, -1, 0, 0, 21, 1, 9 )
+[node name="triangle3" parent="SceneMap" unique_id=525120692 instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 1, 9)
 
-[node name="Triangle5" parent="SceneMap" instance=ExtResource( 7 )]
-transform = Transform( 0, 0, 1, 0, 1, 0, -1, 0, 0, 21, 1, 5 )
+[node name="triangle4" parent="SceneMap" unique_id=236349677 instance=ExtResource("7")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 7, 1, 3)
 
-[node name="Triangle6" parent="SceneMap" instance=ExtResource( 7 )]
-transform = Transform( 0, 0, 1, 0, 1, 0, -1, 0, 0, 21, 1, 1 )
+[node name="triangle5" parent="SceneMap" unique_id=1157843272 instance=ExtResource("7")]
+transform = Transform3D(-0.7071067, 0, -0.7071067, 0, 1, 0, 0.7071067, 0, -0.7071067, 9, 1, -1)
 
-[node name="Triangle7" parent="SceneMap" instance=ExtResource( 7 )]
-transform = Transform( -1, 0, 0, 0, 1, 0, 0, 0, -1, 19, 1, -1 )
+[node name="triangle6" parent="SceneMap" unique_id=340658978 instance=ExtResource("7")]
+transform = Transform3D(-0.7071067, 0, 0.7071067, 0, 1, 0, -0.7071067, 0, -0.7071067, 17, 1, -1)
 
-[node name="Triangle8" parent="SceneMap" instance=ExtResource( 7 )]
-transform = Transform( -1, 0, 0, 0, 1, 0, 0, 0, -1, 15, 1, -1 )
+[node name="triangle7" parent="SceneMap" unique_id=1910996058 instance=ExtResource("7")]
+transform = Transform3D(0.7071068, 0, 0.7071067, 0, 1, 0, -0.7071067, 0, 0.7071068, 17, 1, 7)
 
-[node name="Triangle9" parent="SceneMap" instance=ExtResource( 7 )]
-transform = Transform( -1, 0, 0, 0, 1, 0, 0, 0, -1, 11, 1, -1 )
-
-[node name="Triangle10" parent="SceneMap" instance=ExtResource( 7 )]
-transform = Transform( 0, 0, -1, 0, 1, 0, 1, 0, 0, 9, 1, 1 )
-
-[node name="Triangle11" parent="SceneMap" instance=ExtResource( 7 )]
-transform = Transform( 0, 0, -1, 0, 1, 0, 1, 0, 0, 9, 1, 5 )
-
-[node name="Triangle12" parent="SceneMap" instance=ExtResource( 7 )]
-transform = Transform( 0, 0, -1, 0, 1, 0, 1, 0, 0, 9, 1, 9 )
+[node name="triangle8" parent="SceneMap" unique_id=605180763 instance=ExtResource("7")]
+transform = Transform3D(0.7071068, 0, -0.7071067, 0, 1, 0, 0.7071067, 0, 0.7071068, 9, 1, 7)

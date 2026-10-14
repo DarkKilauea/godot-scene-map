@@ -1,39 +1,37 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene format=3 uid="uid://baagc1mix2la6"]
 
-[sub_resource type="PlaneMesh" id=1]
+[sub_resource type="PlaneMesh" id="1"]
 
-[sub_resource type="ParticlesMaterial" id=2]
-direction = Vector3( 0, 1, 0 )
-spread = 5.0
-gravity = Vector3( 0, 0, 0 )
-initial_velocity = 1.0
-color = Color( 1, 0.639216, 0, 1 )
+[sub_resource type="ParticleProcessMaterial" id="2"]
+direction = Vector3(0, 1, 0)
+spread = 180.0
+initial_velocity_max = 0.5
+gravity = Vector3(0, 1.5, 0)
+color = Color(1, 0.639216, 0, 1)
 
-[sub_resource type="SpatialMaterial" id=3]
+[sub_resource type="StandardMaterial3D" id="3"]
 vertex_color_use_as_albedo = true
-params_billboard_mode = 3
+billboard_mode = 3
 particles_anim_h_frames = 1
 particles_anim_v_frames = 1
 particles_anim_loop = false
 
-[sub_resource type="QuadMesh" id=4]
-material = SubResource( 3 )
-size = Vector2( 0.5, 0.5 )
+[sub_resource type="QuadMesh" id="4"]
+material = SubResource("3")
+size = Vector2(0.5, 0.5)
 
-[node name="FireTile" type="Spatial"]
+[node name="FireTile" type="Node3D" unique_id=2044379638]
 
-[node name="MeshInstance" type="MeshInstance" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0 )
-mesh = SubResource( 1 )
-material/0 = null
+[node name="MeshInstance" type="MeshInstance3D" parent="." unique_id=476376825]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+mesh = SubResource("1")
 
-[node name="Particles" type="Particles" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0 )
-visibility_aabb = AABB( -1, 0, -1, 2, 2, 2 )
-local_coords = false
-process_material = SubResource( 2 )
-draw_pass_1 = SubResource( 4 )
+[node name="Particles" type="GPUParticles3D" parent="." unique_id=352579671]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+visibility_aabb = AABB(-1, 0, -1, 2, 2, 2)
+process_material = SubResource("2")
+draw_pass_1 = SubResource("4")
 
-[node name="OmniLight" type="OmniLight" parent="."]
-light_color = Color( 1, 0.992157, 0.8, 1 )
+[node name="OmniLight" type="OmniLight3D" parent="." unique_id=345733196]
+light_color = Color(1, 0.992157, 0.8, 1)
 omni_attenuation = 2.0

@@ -1,19 +1,37 @@
-[gd_resource type="Resource" load_steps=6 format=2]
+[gd_resource type="Resource" script_class="ScenePalette" format=3 uid="uid://bspblu1fnvlhu"]
 
-[ext_resource path="res://addons/scene_map/scene_palette.gd" type="Script" id=1]
-[ext_resource path="res://tiles/floor_tile.tscn" type="PackedScene" id=2]
-[ext_resource path="res://tiles/block_tile.tscn" type="PackedScene" id=3]
-[ext_resource path="res://tiles/fire_tile.tscn" type="PackedScene" id=4]
-[ext_resource path="res://tiles/triangle_tile.tscn" type="PackedScene" id=5]
+[ext_resource type="Script" uid="uid://bq7wpgx4ixfcq" path="res://addons/scene_map/scene_palette.gd" id="1"]
+[ext_resource type="Script" uid="uid://cuobj06kp8x5k" path="res://addons/scene_map/scene_item.gd" id="1_cvufo"]
+[ext_resource type="PackedScene" path="res://tiles/floor_tile.tscn" id="2_fs5sv"]
+[ext_resource type="PackedScene" path="res://tiles/block_tile.tscn" id="3_qde13"]
+[ext_resource type="PackedScene" uid="uid://baagc1mix2la6" path="res://tiles/fire_tile.tscn" id="4_wgcer"]
+[ext_resource type="PackedScene" path="res://tiles/triangle_tile.tscn" id="5_m82xs"]
+
+[sub_resource type="Resource" id="Resource_qcvlx"]
+script = ExtResource("1_cvufo")
+name = "floor"
+scene = ExtResource("2_fs5sv")
+metadata/_custom_type_script = "uid://cuobj06kp8x5k"
+
+[sub_resource type="Resource" id="Resource_cvufo"]
+script = ExtResource("1_cvufo")
+name = "block"
+scene = ExtResource("3_qde13")
+metadata/_custom_type_script = "uid://cuobj06kp8x5k"
+
+[sub_resource type="Resource" id="Resource_m7ynn"]
+script = ExtResource("1_cvufo")
+name = "fire_tile"
+scene = ExtResource("4_wgcer")
+metadata/_custom_type_script = "uid://cuobj06kp8x5k"
+
+[sub_resource type="Resource" id="Resource_rw6sj"]
+script = ExtResource("1_cvufo")
+name = "triangle"
+scene = ExtResource("5_m82xs")
+metadata/_custom_type_script = "uid://cuobj06kp8x5k"
 
 [resource]
 resource_name = "ScenePalette"
-script = ExtResource( 1 )
-items/0/name = "Floor"
-items/0/scene = ExtResource( 2 )
-items/1/name = "Block"
-items/1/scene = ExtResource( 3 )
-items/2/name = "Fire Floor"
-items/2/scene = ExtResource( 4 )
-items/3/name = "Triangle"
-items/3/scene = ExtResource( 5 )
+script = ExtResource("1")
+item_map = Array[ExtResource("1_cvufo")]([SubResource("Resource_qcvlx"), SubResource("Resource_cvufo"), SubResource("Resource_m7ynn"), SubResource("Resource_rw6sj")])
