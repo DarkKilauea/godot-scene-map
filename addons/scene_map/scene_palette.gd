@@ -1,193 +1,197 @@
-tool
-class_name ScenePalette, "scene_palette.svg"
+@tool
+@icon("scene_palette.svg")
+class_name ScenePalette
+
 extends Resource
 
 
-var item_map := {};
+var item_map := []
 
 
 func _init() -> void:
 	# Set default name so it isn't set to "Resource".
-	resource_name = "ScenePalette";
+	resource_name = "ScenePalette"
 
 
-func _set(property: String, value) -> bool:
+func _set(property: StringName, value : Variant) -> bool:
 	if property.begins_with("items/"):
-		var parts := property.split("/");
+		var parts := property.split("/")
 		if parts.size() != 3:
-			push_error("Not enough parts (need 3) for property: %s" % property);
-			return false;
+			push_error("Not enough parts (need 3) for property: %s" % property)
+			return false
 		
-		var item_id := int(parts[1]);
-		var prop := parts[2];
+		var item_id := int(parts[1])
+		var prop := parts[2]
 		
-		if !item_map.has(item_id):
-			create_item(item_id);
+		if not item_map.size() > item_id:
+			for i in range(item_map.size(), item_id+1):
+				## Create new items until we get to the item_id we were trying to access
+				create_item()
 		
 		match prop:
 			"name":
-				set_item_name(item_id, value);
-				return true;
+				set_item_name(item_id, value)
+				return true
 			"scene":
-				set_item_scene(item_id, value);
-				return true;
+				set_item_scene(item_id, value)
+				return true
 			_:
-				return false;
+				return false
 	
-	return false;
+	return false
 
 
-func _get(property: String):
+func _get(property: StringName):
 	if property.begins_with("items/"):
-		var parts := property.split("/");
+		var parts := property.split("/")
 		if parts.size() != 3:
-			push_error("Not enough parts (need 3) for property: %s" % property);
-			return null;
+			push_error("Not enough parts (need 3) for property: %s" % property)
+			return null
 		
-		var item_id := int(parts[1]);
-		var prop := parts[2];
-		
-		if !item_map.has(item_id):
-			push_error("Item ID is not present in palette.");
-			return null;
+		var item_id := int(parts[1])
+		var prop := parts[2]
+		if item_map.size() < item_id:
+			push_error("(_get error) Item ID %s is out of bounds of palette." % item_id)
+			return null
 		
 		match prop:
 			"name":
-				return get_item_name(item_id);
+				return get_item_name(item_id)
 			"scene":
-				return get_item_scene(item_id);
+				return get_item_scene(item_id)
 			_:
-				return null;
+				return null
 	else:
-		return null;
+		return null
 
 
-func _get_property_list() -> Array:
-	var props := [
+func _get_property_list() -> Array[Dictionary]:
+	var props : Array[Dictionary] = [
 		{
 			"name": "ScenePalette",
 			"type": TYPE_NIL,
 			"usage": PROPERTY_USAGE_CATEGORY
 		}
-	];
+	]
 	
-	for item_id in item_map:
-		var prefix = "items/%d/" % item_id;
+	for item_id in item_map.size():
+		var prefix = "items/%d/" % item_id
 		props.append({ 
 			"name": prefix + "name", 
-			"type": TYPE_STRING 
-		});
+			"type": TYPE_STRING
+		})
 		props.append({ 
 			"name": prefix + "scene", 
 			"type": TYPE_OBJECT, 
 			"hint": PROPERTY_HINT_RESOURCE_TYPE, 
 			"hint_string": "PackedScene" 
-		});
+		})
 		props.append({
 			"name": prefix + "remove_item",
 			"type": TYPE_NIL,
 			"usage": PROPERTY_USAGE_EDITOR
-		});
+		})
 	
 	props.append({
 		"name": "items/%d/add_item" % get_next_available_id(),
 		"type": TYPE_NIL,
 		"usage": PROPERTY_USAGE_EDITOR
-	});
+	})
 	
-	return props;
+	return props
 
 
-func create_item(item_id: int) -> void:
-	if item_id < 0:
-		push_error("Item ID cannot be negative.");
-	if item_map.has(item_id):
-		push_error("Item ID is already present in palette.");
-	
-	item_map[item_id] = Item.new();
-	_emit_changed();
+func create_item() -> void:
+	item_map.append(Item.new())
+	_emit_changed()
 
 
 func remove_item(item_id: int) -> void:
 	if item_id < 0:
-		push_error("Item ID cannot be negative.");
-	if !item_map.has(item_id):
-		push_error("Item ID is not present in palette.");
+		push_error("Item ID cannot be negative.")
 	
-	item_map.erase(item_id);
-	_emit_changed();
+	if not item_map.size() > item_id:
+		push_error("Item ID %s is not present in palette." % item_id)
+		return
+	
+	item_map.remove_at(item_id)
+	_emit_changed()
 
 
 func get_item_name(item_id: int) -> String:
 	if item_id < 0:
-		push_error("Item ID cannot be negative.");
-		return "";
-	if !item_map.has(item_id):
-		push_error("Item ID is not present in palette.");
-		return "";
+		push_error("Item ID cannot be negative.")
+		return ""
 	
-	return item_map[item_id].name;
+	if not item_map.size() > item_id:
+		push_error("Item ID %s is not present in palette." % item_id)
+		return ""
+	
+	return item_map[item_id].name
 
 
 func set_item_name(item_id: int, name: String) -> void:
 	if item_id < 0:
-		push_error("Item ID cannot be negative.");
-	if !item_map.has(item_id):
-		push_error("Item ID is not present in palette.");
+		push_error("Item ID cannot be negative.")
+		return
 	
-	item_map[item_id].name = name;
-	_emit_changed();
+	if not item_map.size() > item_id:
+		push_error("Item ID %s is not present in palette." % item_id)
+		return
+	
+	item_map[item_id].name = name
+	## We don't use '_emit_changed' as notifying the property editor resets the cursor placement in the text box.
+	emit_changed()
 
 
 func get_item_scene(item_id: int) -> PackedScene:
 	if item_id < 0:
-		push_error("Item ID cannot be negative.");
-		return null;
-	if !item_map.has(item_id):
-		push_error("Item ID is not present in palette.");
-		return null;
-	
-	return item_map[item_id].scene;
+		push_error("Item ID cannot be negative.")
+		return null
+	if not item_map.size() > item_id:
+		push_error("Item %s ID is not present in palette." % item_id)
+		return null
+	return item_map[item_id].scene
 
 
 func set_item_scene(item_id: int, scene: PackedScene) -> void:
 	if item_id < 0:
-		push_error("Item ID cannot be negative.");
-	if !item_map.has(item_id):
-		push_error("Item ID is not present in palette.");
+		push_error("Item ID cannot be negative.")
+		return
 	
-	item_map[item_id].scene = scene;
-	_emit_changed();
+	if not item_map.size() > item_id:
+		#print_stack()
+		push_error("Item %s ID is not present in palette." % item_id)
+		return
+	
+	item_map[item_id].scene = scene
+	_emit_changed()
 
 
 func has_item(item_id: int) -> bool:
 	if item_id < 0:
-		push_error("Item ID cannot be negative.");
-	
-	return item_map.has(item_id);
-
-
-func get_item_ids() -> Array:
-	return item_map.keys();
+		push_error("Item ID cannot be negative.")
+		return false
+	return item_map.size() <= item_id
 
 
 func clear() -> void:
-	item_map.clear();
-	_emit_changed();
+	item_map.clear()
+	_emit_changed()
 
 
 func get_next_available_id() -> int:
-	if item_map.empty():
-		return 0;
+	if not item_map:
+		return 0
 	else:
-		return item_map.size();
+		return item_map.size()
 
 
 func _emit_changed():
-	property_list_changed_notify();
-	emit_changed();
+	notify_property_list_changed()
+	emit_changed()
 
 
 class Item:
-	var name: String;
-	var scene: PackedScene;
+	var name: String = ""
+	var scene: PackedScene

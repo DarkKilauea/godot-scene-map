@@ -1,98 +1,130 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene format=3 uid="uid://0y4am010txw5"]
 
-[ext_resource path="res://addons/scene_map/editor/scene_map_editor.gd" type="Script" id=1]
-[ext_resource path="res://addons/scene_map/scene_map.svg" type="Texture" id=2]
+[ext_resource type="Script" uid="uid://cobju7mxdpsqm" path="res://addons/scene_map/editor/scene_map_editor.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bbpyhtf7hb71" path="res://addons/scene_map/scene_map.svg" id="2"]
 
-[node name="SceneMapEditor" type="VBoxContainer"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_right = -794.0
-rect_min_size = Vector2( 230, 0 )
-script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
+[sub_resource type="DPITexture" id="DPITexture_dw1i5"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"M10.168 8.754a5 5 0 1 0-1.414 1.414l4.316 4.316 1.414-1.414zM6 3a3 3 0 0 1 0 6 3 3 0 0 1 0-6z\"/></svg>
+"
+base_scale = 1.5
+saturation = 2.0
+color_map = {
+Color(1, 0.37254903, 0.37254903, 1): Color(1, 0.47, 0.42, 1),
+Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
+Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
 }
 
-[node name="Toolbar" type="HBoxContainer" parent="."]
-margin_right = 230.0
-margin_bottom = 24.0
+[sub_resource type="DPITexture" id="DPITexture_t3keq"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"m2 2v5h5v-5zm7 0v5h5v-5zm-7 7v5h5v-5zm7 0v5h5v-5z\"/></svg>
+"
+base_scale = 1.5
+saturation = 2.0
+color_map = {
+Color(1, 0.37254903, 0.37254903, 1): Color(1, 0.47, 0.42, 1),
+Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
+Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
+}
+
+[sub_resource type="DPITexture" id="DPITexture_jw16i"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"m2 2v2h2v-2zm4 0v2h8v-2zm-4 5v2h2v-2zm4 0v2h8v-2zm-4 5v2h2v-2zm4 0v2h8v-2z\"/></svg>
+"
+base_scale = 1.5
+saturation = 2.0
+color_map = {
+Color(1, 0.37254903, 0.37254903, 1): Color(1, 0.47, 0.42, 1),
+Color(0.37254903, 1, 0.5921569, 1): Color(0.45, 0.95, 0.5, 1),
+Color(1, 0.8666667, 0.39607844, 1): Color(0.83, 0.78, 0.62, 1)
+}
+
+[node name="SceneMapEditor" type="VBoxContainer" unique_id=606856672]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1")
+
+[node name="Toolbar" type="HBoxContainer" parent="." unique_id=1868058935]
+layout_mode = 2
 alignment = 2
 
-[node name="FloorLabel" type="Label" parent="Toolbar"]
-margin_left = 4.0
-margin_top = 5.0
-margin_right = 40.0
-margin_bottom = 19.0
+[node name="FloorLabel" type="Label" parent="Toolbar" unique_id=2036596589]
+layout_mode = 2
 text = "Floor:"
 
-[node name="FloorBox" type="SpinBox" parent="Toolbar"]
-margin_left = 44.0
-margin_right = 118.0
-margin_bottom = 24.0
+[node name="FloorBox" type="SpinBox" parent="Toolbar" unique_id=715558185]
+layout_mode = 2
 min_value = -32767.0
 max_value = 32767.0
 
-[node name="VSeparator" type="VSeparator" parent="Toolbar"]
-margin_left = 122.0
-margin_right = 126.0
-margin_bottom = 24.0
+[node name="VSeparator" type="VSeparator" parent="Toolbar" unique_id=1598250667]
+layout_mode = 2
 
-[node name="MenuButton" type="MenuButton" parent="Toolbar"]
-margin_left = 130.0
-margin_right = 230.0
-margin_bottom = 24.0
+[node name="MenuButton" type="MenuButton" parent="Toolbar" unique_id=299340174]
+layout_mode = 2
 text = "Scene Map"
-icon = ExtResource( 2 )
-items = [ "Previous Floor", null, 0, false, false, 0, 81, null, "", false, "Next Floor", null, 0, false, false, 1, 69, null, "", false, "", null, 0, false, false, -1, 0, null, "", true, "Edit X Axis", null, 2, false, false, 2, 88, null, "", false, "Edit Y Axis", null, 2, true, false, 3, 89, null, "", false, "Edit Z Axis", null, 2, false, false, 4, 90, null, "", false, "", null, 0, false, false, -1, 0, null, "", true, "Rotate Clockwise", null, 0, false, false, 5, 68, null, "", false, "Rotate Counter Clockwise", null, 0, false, false, 6, 65, null, "", false, "Reset Rotation", null, 0, false, false, 7, 83, null, "", false ]
+icon = ExtResource("2")
+item_count = 10
+popup/item_0/text = "Previous Level"
+popup/item_0/id = 0
+popup/item_1/text = "Next Level"
+popup/item_1/id = 1
+popup/item_2/id = 8
+popup/item_2/separator = true
+popup/item_3/text = "Edit Axis X"
+popup/item_3/id = 2
+popup/item_4/text = "Edit Axis Y"
+popup/item_4/id = 3
+popup/item_5/text = "Edit Axis Z"
+popup/item_5/id = 4
+popup/item_6/id = 9
+popup/item_6/separator = true
+popup/item_7/text = "Rotate Clockwise"
+popup/item_7/id = 5
+popup/item_8/text = "Rotate Counter Clockwise"
+popup/item_8/id = 6
+popup/item_9/text = "Reset Rotation"
+popup/item_9/id = 7
 
-[node name="SearchBar" type="HBoxContainer" parent="."]
-margin_top = 28.0
-margin_right = 230.0
-margin_bottom = 52.0
+[node name="SearchBar" type="HBoxContainer" parent="." unique_id=839704557]
+layout_mode = 2
 
-[node name="Search" type="LineEdit" parent="SearchBar"]
-margin_right = 198.0
-margin_bottom = 24.0
+[node name="Search" type="LineEdit" parent="SearchBar" unique_id=81353414]
+layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Filter Scenes"
+right_icon = SubResource("DPITexture_dw1i5")
 
-[node name="Thumbnail" type="Button" parent="SearchBar"]
-margin_left = 202.0
-margin_right = 214.0
-margin_bottom = 24.0
+[node name="Thumbnail" type="Button" parent="SearchBar" unique_id=1905366960]
+layout_mode = 2
 toggle_mode = true
-pressed = true
+icon = SubResource("DPITexture_t3keq")
 flat = true
 
-[node name="List" type="Button" parent="SearchBar"]
-margin_left = 218.0
-margin_right = 230.0
-margin_bottom = 24.0
+[node name="List" type="Button" parent="SearchBar" unique_id=469893422]
+layout_mode = 2
 toggle_mode = true
+icon = SubResource("DPITexture_jw16i")
 flat = true
 
-[node name="Palette" type="ItemList" parent="."]
-margin_top = 56.0
-margin_right = 230.0
-margin_bottom = 326.0
+[node name="Palette" type="ItemList" parent="." unique_id=2013414803]
+layout_mode = 2
 size_flags_vertical = 3
 max_text_lines = 2
+item_count = 1
 max_columns = 0
 fixed_column_width = 64
 icon_mode = 0
-fixed_icon_size = Vector2( 64, 64 )
+fixed_icon_size = Vector2i(64, 64)
+item_0/text = "Example Item"
 
-[node name="NoPaletteWarning" type="Label" parent="."]
-margin_top = 330.0
-margin_right = 230.0
-margin_bottom = 600.0
+[node name="NoPaletteWarning" type="Label" parent="." unique_id=838462856]
+layout_mode = 2
 size_flags_vertical = 3
 text = "Assign a ScenePalette to this SceneMap."
-align = 1
-valign = 1
-autowrap = true
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [connection signal="value_changed" from="Toolbar/FloorBox" to="." method="_floor_changed"]
 [connection signal="text_changed" from="SearchBar/Search" to="." method="_search_text_changed"]
-[connection signal="pressed" from="SearchBar/Thumbnail" to="." method="_set_display_mode" binds= [ 0 ]]
-[connection signal="pressed" from="SearchBar/List" to="." method="_set_display_mode" binds= [ 1 ]]
+[connection signal="pressed" from="SearchBar/Thumbnail" to="." method="_set_display_mode" binds= [0]]
+[connection signal="pressed" from="SearchBar/List" to="." method="_set_display_mode" binds= [1]]
 [connection signal="item_selected" from="Palette" to="." method="_item_selected"]
